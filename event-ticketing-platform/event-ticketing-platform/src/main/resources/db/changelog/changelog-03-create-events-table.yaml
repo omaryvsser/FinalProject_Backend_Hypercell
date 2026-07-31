@@ -21,6 +21,11 @@ databaseChangeLog:
                   name: description
                   type: text
               - column:
+                  name: category
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
                   name: start_date
                   type: timestamp
                   constraints:
@@ -28,11 +33,6 @@ databaseChangeLog:
               - column:
                   name: end_date
                   type: timestamp
-                  constraints:
-                    nullable: false
-              - column:
-                  name: price
-                  type: decimal(10,2)
                   constraints:
                     nullable: false
               - column:

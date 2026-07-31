@@ -1,8 +1,8 @@
 package Enum;
 
 public enum EventStatus {
-    UPCOMING,
-    ONGOING,
+    DRAFT,
+    PUBLISHED,
     COMPLETED,
     CANCELLED
 }

@@ -23,14 +23,14 @@ databaseChangeLog:
                   type: boolean
                   defaultValueBoolean: false
               - column:
-                  name: event_id
+                  name: booking_id
                   type: bigint
                   constraints:
                     nullable: false
 
         - addForeignKeyConstraint:
             baseTableName: tickets
-            baseColumnNames: event_id
-            referencedTableName: events
+            baseColumnNames: booking_id
+            referencedTableName: bookings
             referencedColumnNames: id
-            constraintName: fk_tickets_event
+            constraintName: fk_tickets_booking
