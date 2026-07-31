@@ -1,0 +1,66 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3-create-events-table
+      author: backend-developer
+      changes:
+        - createTable:
+            tableName: events
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: start_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: decimal(10,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: organizer_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: venue_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: events
+            baseColumnNames: organizer_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_events_organizer
+
+        - addForeignKeyConstraint:
+            baseTableName: events
+            baseColumnNames: venue_id
+            referencedTableName: venues
+            referencedColumnNames: id
+            constraintName: fk_events_venue
