@@ -67,6 +67,7 @@ public class GlobalExceptionHandler {
     // 4. Fallback handler for unhandled server errors (500 Internal Server Error)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception ex) {
+        ex.printStackTrace();
         ErrorResponseDto response = ErrorResponseDto.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
