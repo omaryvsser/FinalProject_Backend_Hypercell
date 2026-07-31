@@ -23,16 +23,25 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: quantity
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
                   name: user_id
                   type: bigint
                   constraints:
                     nullable: false
               - column:
-                  name: ticket_id
+                  name: event_id
                   type: bigint
                   constraints:
                     nullable: false
-                    unique: true 
+              - column:
+                  name: seat_category_id
+                  type: bigint
+                  constraints:
+                    nullable: false
 
         - addForeignKeyConstraint:
             baseTableName: bookings
@@ -43,7 +52,14 @@ databaseChangeLog:
 
         - addForeignKeyConstraint:
             baseTableName: bookings
-            baseColumnNames: ticket_id
-            referencedTableName: tickets
+            baseColumnNames: event_id
+            referencedTableName: events
             referencedColumnNames: id
-            constraintName: fk_bookings_ticket
+            constraintName: fk_bookings_event
+
+        - addForeignKeyConstraint:
+            baseTableName: bookings
+            baseColumnNames: seat_category_id
+            referencedTableName: seat_categories
+            referencedColumnNames: id
+            constraintName: fk_bookings_seat_category

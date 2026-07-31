@@ -24,6 +24,6 @@ public class TicketEntity {
     private Boolean isBooked = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id", nullable = false)
-    private EventEntity event;
+    @JoinColumn(name = "booking_id", nullable = false)
+    private BookingEntity booking;
 }
