@@ -2,5 +2,6 @@ package Enum;
 
 public enum SeatCategoryName {
     VIP,
-    STANDARD
+    STANDARD,
+    IMAX // ADDED BY OMAR (NEW)
 }
