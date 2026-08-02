@@ -1,6 +1,7 @@
 package com.hypercell.event_ticketing_platform.Exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -77,7 +78,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    // Handle duplicate resource / conflict exceptions (HTTP 409)
+    // Handle generic resource conflict exceptions (HTTP 409)
     @ExceptionHandler(ResourceAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleResourceAlreadyExistsException(
             ResourceAlreadyExistsException ex, HttpServletRequest request) {
@@ -86,6 +87,36 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT,
                 "Conflict",
                 ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    // Handle our specific User duplicate exceptions (HTTP 409)
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleUserAlreadyExistsException(
+            UserAlreadyExistsException ex, HttpServletRequest request) {
+
+        Map<String, Object> response = buildErrorResponseBody(
+                HttpStatus.CONFLICT,
+                "Conflict",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    // Handle RAW database constraint violations - e.g., unique email in DB (HTTP 409)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+
+        Map<String, Object> response = buildErrorResponseBody(
+                HttpStatus.CONFLICT,
+                "Database Conflict",
+                "A record with this unique identifier already exists.",
                 request.getRequestURI()
         );
 
@@ -120,7 +151,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> response = buildErrorResponseBody(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Internal Server Error",
-                "An unexpected error occurred.",
+                "An unexpected error occurred: " + ex.getMessage(), // Added ex.getMessage() temporarily so you can see exactly what breaks if a 500 happens again
                 request.getRequestURI()
         );
 
@@ -140,5 +171,4 @@ public class GlobalExceptionHandler {
 
         return response;
     }
-}
 }
