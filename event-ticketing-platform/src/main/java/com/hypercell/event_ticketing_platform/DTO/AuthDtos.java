@@ -1,28 +1,52 @@
 package com.hypercell.event_ticketing_platform.DTO;
 
-import com.hypercell.event_ticketing_platform.Enum.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 public class AuthDtos {
 
-    public record RegisterRequest(
-            @NotBlank String username,
-            @NotBlank @Email String email,
-            @NotBlank String password,
-            UserRole role
-    ) {}
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RegisterRequest {
 
-    public record LoginRequest(
-            @NotBlank @Email String email,
-            @NotBlank String password
-    ) {}
+        @NotBlank(message = "Name is required")
+        private String name;
 
-    public record AuthResponse(
-            String token,
-            Long id,
-            String username,
-            String email,
-            UserRole role
-    ) {}
+        @NotBlank(message = "Email is required")
+        @Email(message = "Please provide a valid email address")
+        private String email;
+
+        @NotBlank(message = "Password is required")
+        @Size(min = 6, message = "Password must be at least 6 characters long")
+        private String password;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class LoginRequest {
+
+        @NotBlank(message = "Email is required")
+        @Email(message = "Please provide a valid email address")
+        private String email;
+
+        @NotBlank(message = "Password is required")
+        private String password;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AuthResponse {
+        private String token;
+    }
 }

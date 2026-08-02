@@ -21,36 +21,38 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Email already in use");
-        }
-        if (userRepository.existsByUsername(request.username())) {
-            throw new IllegalArgumentException("Username already in use");
-        }
+        var user = UserEntity.builder()
+                .username(request.getName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(UserRole.CUSTOMER) // Default role
+                .build();
+        userRepository.save(user);
 
-        UserRole role = request.role() != null ? request.role() : UserRole.CUSTOMER;
-
-        UserEntity user = UserEntity.builder()
-                .username(request.username())
-                .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
-                .role(role)
+        var userDetails = org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .roles(user.getRole().name())
                 .build();
 
-        userRepository.save(user);
-        String jwtToken = jwtService.generateToken(user);
-        return new AuthResponse(jwtToken, user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+        var jwtToken = jwtService.generateToken(userDetails);
+        return AuthResponse.builder().token(jwtToken).build();
     }
 
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow();
 
-        UserEntity user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+        var userDetails = org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .roles(user.getRole() != null ? user.getRole().name() : "USER")
+                .build();
 
-        String jwtToken = jwtService.generateToken(user);
-        return new AuthResponse(jwtToken, user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+        var jwtToken = jwtService.generateToken(userDetails);
+        return AuthResponse.builder().token(jwtToken).build();
     }
 }

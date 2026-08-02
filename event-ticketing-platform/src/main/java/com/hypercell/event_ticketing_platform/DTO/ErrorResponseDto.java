@@ -13,11 +13,12 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL) // Omit null fields (like validationErrors on standard errors)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponseDto {
     private LocalDateTime timestamp;
     private int status;
     private String error;
     private String message;
-    private Map<String, String> validationErrors; // Field-level error details
+    private String path;
+    private Map<String, String> validationErrors; // Populated only for validation failures
 }

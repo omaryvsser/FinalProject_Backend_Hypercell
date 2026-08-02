@@ -21,14 +21,13 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return email -> userRepository.findByEmail(email)
+        return username -> userRepository.findByEmail(username)
                 .map(user -> org.springframework.security.core.userdetails.User.builder()
                         .username(user.getEmail())
                         .password(user.getPassword())
-                        .authorities("ROLE_" + user.getRole().name())
-                        .build()
-                )
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+                        .roles(user.getRole() != null ? user.getRole().name() : "USER")
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
     @Bean
