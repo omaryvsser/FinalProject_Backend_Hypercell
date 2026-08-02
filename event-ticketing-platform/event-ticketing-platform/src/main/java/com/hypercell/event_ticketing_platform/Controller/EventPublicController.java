@@ -3,10 +3,12 @@ package com.hypercell.event_ticketing_platform.Controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hypercell.event_ticketing_platform.DTO.EventDetailDto;
 import com.hypercell.event_ticketing_platform.DTO.EventResponseDto;
 import com.hypercell.event_ticketing_platform.DTO.EventSearchFilterDto;
 import com.hypercell.event_ticketing_platform.Service.SearchPublicEvents;
@@ -38,5 +40,11 @@ public class EventPublicController {
 
         Page<EventResponseDto> response = searchPublicEvents.searchevPage(filterDto);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EventDetailDto> getEventDetails(@PathVariable Long id) {
+        EventDetailDto eventDetails = searchPublicEvents.getEventDetails(id);
+        return ResponseEntity.ok(eventDetails);
     }
 }
