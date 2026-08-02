@@ -3,6 +3,9 @@ package com.hypercell.event_ticketing_platform.Exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,6 +16,51 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // 1. Handle Security: Bad Credentials / Wrong Password or Email (HTTP 401)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentialsException(
+            BadCredentialsException ex, HttpServletRequest request) {
+
+        Map<String, Object> response = buildErrorResponseBody(
+                HttpStatus.UNAUTHORIZED,
+                "Unauthorized",
+                "Invalid email or password",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    // 2. Handle Security: Access Denied / Insufficient Permissions (HTTP 403)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(
+            AccessDeniedException ex, HttpServletRequest request) {
+
+        Map<String, Object> response = buildErrorResponseBody(
+                HttpStatus.FORBIDDEN,
+                "Forbidden",
+                "You do not have permission to access this resource",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    // 3. Handle Security: Generic Authentication Failures (HTTP 401)
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthenticationException(
+            AuthenticationException ex, HttpServletRequest request) {
+
+        Map<String, Object> response = buildErrorResponseBody(
+                HttpStatus.UNAUTHORIZED,
+                "Unauthorized",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 
     // Handle resource not found exceptions (HTTP 404)
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -92,4 +140,5 @@ public class GlobalExceptionHandler {
 
         return response;
     }
+}
 }
