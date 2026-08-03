@@ -18,4 +18,5 @@ public class EventResponseDto {
     private LocalDateTime endDate;
     private EventStatus status;
     private String venueName;
+    private String imageUrl;
 }

@@ -19,6 +19,7 @@ public class EventDetailDto {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private EventStatus status;
+    private String imageUrl;
 
     private String venueName;
     private String venueAddress;

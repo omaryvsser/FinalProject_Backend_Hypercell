@@ -40,6 +40,7 @@ public class SearchPublicEvents {
                 .endDate(event.getEndDate())
                 .status(event.getStatus())
                 .venueName(event.getVenue() != null ? event.getVenue().getName() : null)
+                .imageUrl(event.getImageUrl())
                 .build());
     }
 
@@ -55,6 +56,7 @@ public class SearchPublicEvents {
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .status(event.getStatus())
+                .imageUrl(event.getImageUrl())
                 .venueName(event.getVenue() != null ? event.getVenue().getName() : null)
                 .venueAddress(event.getVenue() != null ? event.getVenue().getAddress() : null)
                 .seatCategories(

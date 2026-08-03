@@ -1,0 +1,759 @@
+databaseChangeLog:
+  - changeSet:
+      id: 9-seed-data
+      author: backend-developer
+      comment: "Seed data for testing - users, venues, events, seat categories, bookings, tickets, and payments"
+      changes:
+
+        # ===================== USERS =====================
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: username, value: "admin_user" }
+              - column: { name: email, value: "admin@ticketing.com" }
+              - column: { name: password, value: "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ12" }
+              - column: { name: role, value: "ADMIN" }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: username, value: "ahmed_organizer" }
+              - column: { name: email, value: "ahmed@events.com" }
+              - column: { name: password, value: "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ12" }
+              - column: { name: role, value: "ORGANIZER" }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: username, value: "sara_organizer" }
+              - column: { name: email, value: "sara@events.com" }
+              - column: { name: password, value: "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ12" }
+              - column: { name: role, value: "ORGANIZER" }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: username, value: "omar_customer" }
+              - column: { name: email, value: "omar@gmail.com" }
+              - column: { name: password, value: "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ12" }
+              - column: { name: role, value: "CUSTOMER" }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: username, value: "mona_customer" }
+              - column: { name: email, value: "mona@gmail.com" }
+              - column: { name: password, value: "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ12" }
+              - column: { name: role, value: "CUSTOMER" }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: username, value: "khaled_customer" }
+              - column: { name: email, value: "khaled@gmail.com" }
+              - column: { name: password, value: "$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ12" }
+              - column: { name: role, value: "CUSTOMER" }
+
+        # ===================== VENUES =====================
+        - insert:
+            tableName: venues
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "Cairo International Conference Center" }
+              - column: { name: address, value: "Nasr City, Cairo, Egypt" }
+              - column: { name: capacity, valueNumeric: 5000 }
+
+        - insert:
+            tableName: venues
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "Al Manara Arts Center" }
+              - column: { name: address, value: "New Cairo, Egypt" }
+              - column: { name: capacity, valueNumeric: 2000 }
+
+        - insert:
+            tableName: venues
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: name, value: "Egyptian Opera House" }
+              - column: { name: address, value: "Zamalek, Cairo, Egypt" }
+              - column: { name: capacity, valueNumeric: 1200 }
+
+        - insert:
+            tableName: venues
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: name, value: "Smart Village Amphitheater" }
+              - column: { name: address, value: "Smart Village, 6th of October, Giza" }
+              - column: { name: capacity, valueNumeric: 3000 }
+
+        - insert:
+            tableName: venues
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: name, value: "Alexandria Library Auditorium" }
+              - column: { name: address, value: "Chatby, Alexandria, Egypt" }
+              - column: { name: capacity, valueNumeric: 1500 }
+
+        # ===================== EVENTS =====================
+        - insert:
+            tableName: events
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: title, value: "Tech Summit 2026" }
+              - column: { name: description, value: "The biggest technology conference in the Middle East featuring top speakers, workshops, and networking opportunities." }
+              - column: { name: category, value: "Technology" }
+              - column: { name: start_date, valueDate: "2026-09-15T09:00:00" }
+              - column: { name: end_date, valueDate: "2026-09-17T18:00:00" }
+              - column: { name: status, value: "PUBLISHED" }
+              - column: { name: organizer_id, valueNumeric: 2 }
+              - column: { name: venue_id, valueNumeric: 1 }
+              - column: { name: image_url, value: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800" }
+
+        - insert:
+            tableName: events
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: title, value: "Cairo Jazz Festival" }
+              - column: { name: description, value: "An evening of world-class jazz performances featuring international and local artists in a stunning open-air setting." }
+              - column: { name: category, value: "Music" }
+              - column: { name: start_date, valueDate: "2026-10-05T19:00:00" }
+              - column: { name: end_date, valueDate: "2026-10-05T23:30:00" }
+              - column: { name: status, value: "PUBLISHED" }
+              - column: { name: organizer_id, valueNumeric: 3 }
+              - column: { name: venue_id, valueNumeric: 3 }
+              - column: { name: image_url, value: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=800" }
+
+        - insert:
+            tableName: events
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: title, value: "Startup Pitch Night" }
+              - column: { name: description, value: "Watch 20 innovative startups pitch their ideas to top investors. Great networking opportunity for entrepreneurs and investors alike." }
+              - column: { name: category, value: "Business" }
+              - column: { name: start_date, valueDate: "2026-09-25T17:00:00" }
+              - column: { name: end_date, valueDate: "2026-09-25T21:00:00" }
+              - column: { name: status, value: "PUBLISHED" }
+              - column: { name: organizer_id, valueNumeric: 2 }
+              - column: { name: venue_id, valueNumeric: 4 }
+              - column: { name: image_url, value: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800" }
+
+        - insert:
+            tableName: events
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: title, value: "Egyptian Art Exhibition" }
+              - column: { name: description, value: "A curated exhibition showcasing contemporary Egyptian art from emerging and established artists." }
+              - column: { name: category, value: "Art" }
+              - column: { name: start_date, valueDate: "2026-11-01T10:00:00" }
+              - column: { name: end_date, valueDate: "2026-11-10T20:00:00" }
+              - column: { name: status, value: "DRAFT" }
+              - column: { name: organizer_id, valueNumeric: 3 }
+              - column: { name: venue_id, valueNumeric: 2 }
+              - column: { name: image_url, value: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800" }
+
+        - insert:
+            tableName: events
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: title, value: "Marathon Alexandria 2026" }
+              - column: { name: description, value: "Annual marathon along the beautiful Alexandria corniche. Categories: 5K, 10K, half marathon, and full marathon." }
+              - column: { name: category, value: "Sports" }
+              - column: { name: start_date, valueDate: "2026-12-01T06:00:00" }
+              - column: { name: end_date, valueDate: "2026-12-01T14:00:00" }
+              - column: { name: status, value: "PUBLISHED" }
+              - column: { name: organizer_id, valueNumeric: 2 }
+              - column: { name: venue_id, valueNumeric: 5 }
+              - column: { name: image_url, value: "https://images.unsplash.com/photo-1513593771513-7b58b6c4af38?w=800" }
+
+        - insert:
+            tableName: events
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: title, value: "Gaming Expo Egypt" }
+              - column: { name: description, value: "The ultimate gaming experience with tournaments, demos of upcoming titles, cosplay competitions, and meet-and-greets with streamers." }
+              - column: { name: category, value: "Gaming" }
+              - column: { name: start_date, valueDate: "2026-10-20T10:00:00" }
+              - column: { name: end_date, valueDate: "2026-10-22T22:00:00" }
+              - column: { name: status, value: "PUBLISHED" }
+              - column: { name: organizer_id, valueNumeric: 3 }
+              - column: { name: venue_id, valueNumeric: 1 }
+              - column: { name: image_url, value: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800" }
+
+        - insert:
+            tableName: events
+            columns:
+              - column: { name: id, valueNumeric: 7 }
+              - column: { name: title, value: "Food & Culture Festival" }
+              - column: { name: description, value: "Taste dishes from 50+ vendors, enjoy cooking workshops with celebrity chefs, and experience live cultural performances." }
+              - column: { name: category, value: "Food" }
+              - column: { name: start_date, valueDate: "2026-08-20T11:00:00" }
+              - column: { name: end_date, valueDate: "2026-08-22T23:00:00" }
+              - column: { name: status, value: "COMPLETED" }
+              - column: { name: organizer_id, valueNumeric: 2 }
+              - column: { name: venue_id, valueNumeric: 4 }
+              - column: { name: image_url, value: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800" }
+
+        - insert:
+            tableName: events
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: title, value: "Classical Music Night" }
+              - column: { name: description, value: "An enchanting evening of classical music performed by the Cairo Symphony Orchestra." }
+              - column: { name: category, value: "Music" }
+              - column: { name: start_date, valueDate: "2026-07-10T20:00:00" }
+              - column: { name: end_date, valueDate: "2026-07-10T22:30:00" }
+              - column: { name: status, value: "CANCELLED" }
+              - column: { name: organizer_id, valueNumeric: 3 }
+              - column: { name: venue_id, valueNumeric: 3 }
+              - column: { name: image_url, value: "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=800" }
+
+        # ===================== SEAT CATEGORIES =====================
+        # Event 1 - Tech Summit 2026
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "VIP" }
+              - column: { name: price, valueNumeric: 500.00 }
+              - column: { name: total_seats, valueNumeric: 200 }
+              - column: { name: available_seats, valueNumeric: 188 }
+              - column: { name: event_id, valueNumeric: 1 }
+
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "STANDARD" }
+              - column: { name: price, valueNumeric: 150.00 }
+              - column: { name: total_seats, valueNumeric: 1000 }
+              - column: { name: available_seats, valueNumeric: 995 }
+              - column: { name: event_id, valueNumeric: 1 }
+
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: name, value: "IMAX" }
+              - column: { name: price, valueNumeric: 300.00 }
+              - column: { name: total_seats, valueNumeric: 500 }
+              - column: { name: available_seats, valueNumeric: 498 }
+              - column: { name: event_id, valueNumeric: 1 }
+
+        # Event 2 - Cairo Jazz Festival
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: name, value: "VIP" }
+              - column: { name: price, valueNumeric: 350.00 }
+              - column: { name: total_seats, valueNumeric: 100 }
+              - column: { name: available_seats, valueNumeric: 97 }
+              - column: { name: event_id, valueNumeric: 2 }
+
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: name, value: "STANDARD" }
+              - column: { name: price, valueNumeric: 100.00 }
+              - column: { name: total_seats, valueNumeric: 500 }
+              - column: { name: available_seats, valueNumeric: 496 }
+              - column: { name: event_id, valueNumeric: 2 }
+
+        # Event 3 - Startup Pitch Night
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: name, value: "VIP" }
+              - column: { name: price, valueNumeric: 200.00 }
+              - column: { name: total_seats, valueNumeric: 50 }
+              - column: { name: available_seats, valueNumeric: 48 }
+              - column: { name: event_id, valueNumeric: 3 }
+
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 7 }
+              - column: { name: name, value: "STANDARD" }
+              - column: { name: price, valueNumeric: 75.00 }
+              - column: { name: total_seats, valueNumeric: 300 }
+              - column: { name: available_seats, valueNumeric: 297 }
+              - column: { name: event_id, valueNumeric: 3 }
+
+        # Event 4 - Egyptian Art Exhibition
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: name, value: "STANDARD" }
+              - column: { name: price, valueNumeric: 50.00 }
+              - column: { name: total_seats, valueNumeric: 500 }
+              - column: { name: available_seats, valueNumeric: 500 }
+              - column: { name: event_id, valueNumeric: 4 }
+
+        # Event 5 - Marathon Alexandria
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 9 }
+              - column: { name: name, value: "STANDARD" }
+              - column: { name: price, valueNumeric: 120.00 }
+              - column: { name: total_seats, valueNumeric: 1000 }
+              - column: { name: available_seats, valueNumeric: 998 }
+              - column: { name: event_id, valueNumeric: 5 }
+
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 10 }
+              - column: { name: name, value: "VIP" }
+              - column: { name: price, valueNumeric: 250.00 }
+              - column: { name: total_seats, valueNumeric: 100 }
+              - column: { name: available_seats, valueNumeric: 100 }
+              - column: { name: event_id, valueNumeric: 5 }
+
+        # Event 6 - Gaming Expo
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 11 }
+              - column: { name: name, value: "VIP" }
+              - column: { name: price, valueNumeric: 400.00 }
+              - column: { name: total_seats, valueNumeric: 150 }
+              - column: { name: available_seats, valueNumeric: 150 }
+              - column: { name: event_id, valueNumeric: 6 }
+
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 12 }
+              - column: { name: name, value: "STANDARD" }
+              - column: { name: price, valueNumeric: 180.00 }
+              - column: { name: total_seats, valueNumeric: 800 }
+              - column: { name: available_seats, valueNumeric: 800 }
+              - column: { name: event_id, valueNumeric: 6 }
+
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 13 }
+              - column: { name: name, value: "IMAX" }
+              - column: { name: price, valueNumeric: 280.00 }
+              - column: { name: total_seats, valueNumeric: 300 }
+              - column: { name: available_seats, valueNumeric: 300 }
+              - column: { name: event_id, valueNumeric: 6 }
+
+        # Event 7 - Food Festival (completed)
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 14 }
+              - column: { name: name, value: "STANDARD" }
+              - column: { name: price, valueNumeric: 80.00 }
+              - column: { name: total_seats, valueNumeric: 2000 }
+              - column: { name: available_seats, valueNumeric: 0 }
+              - column: { name: event_id, valueNumeric: 7 }
+
+        # Event 8 - Classical Music Night (cancelled)
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 15 }
+              - column: { name: name, value: "VIP" }
+              - column: { name: price, valueNumeric: 300.00 }
+              - column: { name: total_seats, valueNumeric: 100 }
+              - column: { name: available_seats, valueNumeric: 100 }
+              - column: { name: event_id, valueNumeric: 8 }
+
+        - insert:
+            tableName: seat_categories
+            columns:
+              - column: { name: id, valueNumeric: 16 }
+              - column: { name: name, value: "STANDARD" }
+              - column: { name: price, valueNumeric: 100.00 }
+              - column: { name: total_seats, valueNumeric: 400 }
+              - column: { name: available_seats, valueNumeric: 400 }
+              - column: { name: event_id, valueNumeric: 8 }
+
+        # ===================== BOOKINGS =====================
+        # Omar books VIP for Tech Summit (2 tickets)
+        - insert:
+            tableName: bookings
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: booking_date, valueDate: "2026-08-01T10:30:00" }
+              - column: { name: status, value: "CONFIRMED" }
+              - column: { name: quantity, valueNumeric: 2 }
+              - column: { name: user_id, valueNumeric: 4 }
+              - column: { name: event_id, valueNumeric: 1 }
+              - column: { name: seat_category_id, valueNumeric: 1 }
+
+        # Mona books STANDARD for Tech Summit (5 tickets)
+        - insert:
+            tableName: bookings
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: booking_date, valueDate: "2026-08-01T14:00:00" }
+              - column: { name: status, value: "CONFIRMED" }
+              - column: { name: quantity, valueNumeric: 5 }
+              - column: { name: user_id, valueNumeric: 5 }
+              - column: { name: event_id, valueNumeric: 1 }
+              - column: { name: seat_category_id, valueNumeric: 2 }
+
+        # Khaled books VIP for Jazz Festival (3 tickets)
+        - insert:
+            tableName: bookings
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: booking_date, valueDate: "2026-08-02T09:15:00" }
+              - column: { name: status, value: "CONFIRMED" }
+              - column: { name: quantity, valueNumeric: 3 }
+              - column: { name: user_id, valueNumeric: 6 }
+              - column: { name: event_id, valueNumeric: 2 }
+              - column: { name: seat_category_id, valueNumeric: 4 }
+
+        # Omar books STANDARD for Jazz Festival (4 tickets)
+        - insert:
+            tableName: bookings
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: booking_date, valueDate: "2026-08-02T11:45:00" }
+              - column: { name: status, value: "PENDING" }
+              - column: { name: quantity, valueNumeric: 4 }
+              - column: { name: user_id, valueNumeric: 4 }
+              - column: { name: event_id, valueNumeric: 2 }
+              - column: { name: seat_category_id, valueNumeric: 5 }
+
+        # Mona books VIP for Startup Pitch Night (2 tickets)
+        - insert:
+            tableName: bookings
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: booking_date, valueDate: "2026-08-03T08:00:00" }
+              - column: { name: status, value: "CONFIRMED" }
+              - column: { name: quantity, valueNumeric: 2 }
+              - column: { name: user_id, valueNumeric: 5 }
+              - column: { name: event_id, valueNumeric: 3 }
+              - column: { name: seat_category_id, valueNumeric: 6 }
+
+        # Khaled books STANDARD for Startup Pitch Night (3 tickets) — CANCELLED
+        - insert:
+            tableName: bookings
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: booking_date, valueDate: "2026-08-03T09:30:00" }
+              - column: { name: status, value: "CANCELLED" }
+              - column: { name: quantity, valueNumeric: 3 }
+              - column: { name: user_id, valueNumeric: 6 }
+              - column: { name: event_id, valueNumeric: 3 }
+              - column: { name: seat_category_id, valueNumeric: 7 }
+
+        # Omar books IMAX for Tech Summit (2 tickets)
+        - insert:
+            tableName: bookings
+            columns:
+              - column: { name: id, valueNumeric: 7 }
+              - column: { name: booking_date, valueDate: "2026-08-03T12:00:00" }
+              - column: { name: status, value: "CONFIRMED" }
+              - column: { name: quantity, valueNumeric: 2 }
+              - column: { name: user_id, valueNumeric: 4 }
+              - column: { name: event_id, valueNumeric: 1 }
+              - column: { name: seat_category_id, valueNumeric: 3 }
+
+        # Khaled books STANDARD for Marathon (2 tickets)
+        - insert:
+            tableName: bookings
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: booking_date, valueDate: "2026-08-03T15:00:00" }
+              - column: { name: status, value: "CONFIRMED" }
+              - column: { name: quantity, valueNumeric: 2 }
+              - column: { name: user_id, valueNumeric: 6 }
+              - column: { name: event_id, valueNumeric: 5 }
+              - column: { name: seat_category_id, valueNumeric: 9 }
+
+        # ===================== TICKETS =====================
+        # Booking 1: Omar - Tech Summit VIP (2 tickets)
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: ticket_number, value: "TS2026-VIP-001" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 1 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: ticket_number, value: "TS2026-VIP-002" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 1 }
+
+        # Booking 2: Mona - Tech Summit STANDARD (5 tickets)
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: ticket_number, value: "TS2026-STD-001" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 2 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: ticket_number, value: "TS2026-STD-002" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 2 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: ticket_number, value: "TS2026-STD-003" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 2 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: ticket_number, value: "TS2026-STD-004" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 2 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 7 }
+              - column: { name: ticket_number, value: "TS2026-STD-005" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 2 }
+
+        # Booking 3: Khaled - Jazz VIP (3 tickets)
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: ticket_number, value: "CJF-VIP-001" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 3 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 9 }
+              - column: { name: ticket_number, value: "CJF-VIP-002" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 3 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 10 }
+              - column: { name: ticket_number, value: "CJF-VIP-003" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 3 }
+
+        # Booking 4: Omar - Jazz STANDARD (4 tickets)
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 11 }
+              - column: { name: ticket_number, value: "CJF-STD-001" }
+              - column: { name: is_booked, valueBoolean: false }
+              - column: { name: booking_id, valueNumeric: 4 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 12 }
+              - column: { name: ticket_number, value: "CJF-STD-002" }
+              - column: { name: is_booked, valueBoolean: false }
+              - column: { name: booking_id, valueNumeric: 4 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 13 }
+              - column: { name: ticket_number, value: "CJF-STD-003" }
+              - column: { name: is_booked, valueBoolean: false }
+              - column: { name: booking_id, valueNumeric: 4 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 14 }
+              - column: { name: ticket_number, value: "CJF-STD-004" }
+              - column: { name: is_booked, valueBoolean: false }
+              - column: { name: booking_id, valueNumeric: 4 }
+
+        # Booking 5: Mona - Startup Pitch VIP (2 tickets)
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 15 }
+              - column: { name: ticket_number, value: "SPN-VIP-001" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 5 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 16 }
+              - column: { name: ticket_number, value: "SPN-VIP-002" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 5 }
+
+        # Booking 6: Khaled - Startup STANDARD CANCELLED (3 tickets)
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 17 }
+              - column: { name: ticket_number, value: "SPN-STD-001" }
+              - column: { name: is_booked, valueBoolean: false }
+              - column: { name: booking_id, valueNumeric: 6 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 18 }
+              - column: { name: ticket_number, value: "SPN-STD-002" }
+              - column: { name: is_booked, valueBoolean: false }
+              - column: { name: booking_id, valueNumeric: 6 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 19 }
+              - column: { name: ticket_number, value: "SPN-STD-003" }
+              - column: { name: is_booked, valueBoolean: false }
+              - column: { name: booking_id, valueNumeric: 6 }
+
+        # Booking 7: Omar - Tech Summit IMAX (2 tickets)
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 20 }
+              - column: { name: ticket_number, value: "TS2026-IMAX-001" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 7 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 21 }
+              - column: { name: ticket_number, value: "TS2026-IMAX-002" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 7 }
+
+        # Booking 8: Khaled - Marathon STANDARD (2 tickets)
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 22 }
+              - column: { name: ticket_number, value: "MA2026-STD-001" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 8 }
+        - insert:
+            tableName: tickets
+            columns:
+              - column: { name: id, valueNumeric: 23 }
+              - column: { name: ticket_number, value: "MA2026-STD-002" }
+              - column: { name: is_booked, valueBoolean: true }
+              - column: { name: booking_id, valueNumeric: 8 }
+
+        # ===================== PAYMENTS =====================
+        # Payment for Booking 1: Omar - Tech Summit VIP (2 x 500 = 1000)
+        - insert:
+            tableName: payments
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: amount, valueNumeric: 1000.00 }
+              - column: { name: payment_method, value: "CREDIT_CARD" }
+              - column: { name: status, value: "SUCCESS" }
+              - column: { name: transaction_id, value: "TXN-20260801-001" }
+              - column: { name: booking_id, valueNumeric: 1 }
+
+        # Payment for Booking 2: Mona - Tech Summit STANDARD (5 x 150 = 750)
+        - insert:
+            tableName: payments
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: amount, valueNumeric: 750.00 }
+              - column: { name: payment_method, value: "PAYPAL" }
+              - column: { name: status, value: "SUCCESS" }
+              - column: { name: transaction_id, value: "TXN-20260801-002" }
+              - column: { name: booking_id, valueNumeric: 2 }
+
+        # Payment for Booking 3: Khaled - Jazz VIP (3 x 350 = 1050)
+        - insert:
+            tableName: payments
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: amount, valueNumeric: 1050.00 }
+              - column: { name: payment_method, value: "CREDIT_CARD" }
+              - column: { name: status, value: "SUCCESS" }
+              - column: { name: transaction_id, value: "TXN-20260802-001" }
+              - column: { name: booking_id, valueNumeric: 3 }
+
+        # Payment for Booking 4: Omar - Jazz STANDARD (4 x 100 = 400) — PENDING
+        - insert:
+            tableName: payments
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: amount, valueNumeric: 400.00 }
+              - column: { name: payment_method, value: "CASH" }
+              - column: { name: status, value: "PENDING" }
+              - column: { name: transaction_id, value: "TXN-20260802-002" }
+              - column: { name: booking_id, valueNumeric: 4 }
+
+        # Payment for Booking 5: Mona - Startup VIP (2 x 200 = 400)
+        - insert:
+            tableName: payments
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: amount, valueNumeric: 400.00 }
+              - column: { name: payment_method, value: "CREDIT_CARD" }
+              - column: { name: status, value: "SUCCESS" }
+              - column: { name: transaction_id, value: "TXN-20260803-001" }
+              - column: { name: booking_id, valueNumeric: 5 }
+
+        # Payment for Booking 6: Khaled - Startup STANDARD CANCELLED (3 x 75 = 225) — FAILED
+        - insert:
+            tableName: payments
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: amount, valueNumeric: 225.00 }
+              - column: { name: payment_method, value: "PAYPAL" }
+              - column: { name: status, value: "FAILED" }
+              - column: { name: transaction_id, value: "TXN-20260803-002" }
+              - column: { name: booking_id, valueNumeric: 6 }
+
+        # Payment for Booking 7: Omar - Tech Summit IMAX (2 x 300 = 600)
+        - insert:
+            tableName: payments
+            columns:
+              - column: { name: id, valueNumeric: 7 }
+              - column: { name: amount, valueNumeric: 600.00 }
+              - column: { name: payment_method, value: "CREDIT_CARD" }
+              - column: { name: status, value: "SUCCESS" }
+              - column: { name: transaction_id, value: "TXN-20260803-003" }
+              - column: { name: booking_id, valueNumeric: 7 }
+
+        # Payment for Booking 8: Khaled - Marathon STANDARD (2 x 120 = 240)
+        - insert:
+            tableName: payments
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: amount, valueNumeric: 240.00 }
+              - column: { name: payment_method, value: "CASH" }
+              - column: { name: status, value: "SUCCESS" }
+              - column: { name: transaction_id, value: "TXN-20260803-004" }
+              - column: { name: booking_id, valueNumeric: 8 }
+
+        # ===================== RESET SEQUENCES =====================
+        - sql:
+            sql: >
+              SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
+              SELECT setval('venues_id_seq', (SELECT MAX(id) FROM venues));
+              SELECT setval('events_id_seq', (SELECT MAX(id) FROM events));
+              SELECT setval('seat_categories_id_seq', (SELECT MAX(id) FROM seat_categories));
+              SELECT setval('bookings_id_seq', (SELECT MAX(id) FROM bookings));
+              SELECT setval('tickets_id_seq', (SELECT MAX(id) FROM tickets));
+              SELECT setval('payments_id_seq', (SELECT MAX(id) FROM payments));

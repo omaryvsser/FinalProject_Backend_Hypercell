@@ -1,6 +1,6 @@
 package com.hypercell.event_ticketing_platform.DTO;
 
-import com.hypercell.event_ticketing_platform.Enum.BookingStatus; // تأكد إنك عامل Enum بالحالات دي أو استخدم String لو عاملها سترينج
+import com.hypercell.event_ticketing_platform.Enum.BookingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
