@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hypercell.event_ticketing_platform.Enum.EventStatus;
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,24 +19,29 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UpdateEventDto {
+public class CreateEventDto {
 
+    @NotBlank(message = "Title is required")
     @Size(max = 255, message = "Event title must not exceed 255 characters")
-    private String title; // Updated event title
+    private String title;
 
     @Size(max = 2000, message = "Event description must not exceed 2000 characters")
-    private String description; // Updated event description
+    private String description;
 
+    @NotBlank(message = "Category is required")
     @Size(max = 100, message = "Event category must not exceed 100 characters")
-    private String category; // Updated event category
+    private String category;
 
+    @NotNull(message = "Start date is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S][XXX][X]")
-    private LocalDateTime startDate; // Updated event start date and time
+    private LocalDateTime startDate;
 
+    @NotNull(message = "End date is required")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S][XXX][X]")
-    private LocalDateTime endDate; // Updated event end date and time
+    private LocalDateTime endDate;
 
-    private EventStatus status; // Updated event status
+    private EventStatus status;
 
-    private Long venueId; // Updated venue identifier
+    @NotNull(message = "Venue ID is required")
+    private Long venueId;
 }

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 09-sync-seat-categories-seq
+      author: backend-developer
+      changes:
+        - sql:
+            sql: SELECT setval('seat_categories_id_seq', (SELECT MAX(id) FROM seat_categories));
