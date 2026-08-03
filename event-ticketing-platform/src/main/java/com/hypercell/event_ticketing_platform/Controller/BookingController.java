@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/bookings")
-
 public class BookingController {
 
     private final BookingService bookingService;
@@ -28,11 +27,10 @@ public class BookingController {
     }
 
     // بنحول بس ال حاله ال booking من pending ل cancelled
-    @PatchMapping("{id}/cancel")
+    @PatchMapping("/{id}/cancel")
     public ResponseEntity<String> cancelBooking(@PathVariable Long id) {
         bookingService.cancelBooking(id);
         return ResponseEntity.ok("Booking cancelled successfully and seats restored.");
-
     }
 
     // عرض حجوزات مستخدم معين
@@ -46,5 +44,4 @@ public class BookingController {
     public ResponseEntity<List<BookingResponseDto>> getEventBookings(@PathVariable Long eventId) {
         return ResponseEntity.ok(bookingService.getEventBookings(eventId));
     }
-
 }

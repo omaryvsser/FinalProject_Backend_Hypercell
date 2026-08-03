@@ -9,7 +9,6 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
 
-    // دول عشان نقدر نبحث بيهم عن حجوزات اليوزر أو الإيفنت
     List<BookingEntity> findByUserId(Long userId);
 
     List<BookingEntity> findByEventId(Long eventId);
