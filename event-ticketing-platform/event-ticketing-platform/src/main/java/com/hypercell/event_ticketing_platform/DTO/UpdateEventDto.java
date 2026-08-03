@@ -36,4 +36,7 @@ public class UpdateEventDto {
     private EventStatus status; // Updated event status
 
     private Long venueId; // Updated venue identifier
+
+    @Size(max = 500, message = "Image URL must not exceed 500 characters")
+    private String imageUrl; // Updated event image URL
 }

@@ -16,9 +16,9 @@ import com.hypercell.event_ticketing_platform.Enum.EventStatus;
 @Repository
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
-        @Query("SELECT e FROM EventEntity e WHERE e.status = :status " +
-                        "AND (:category IS NULL OR e.category = :category) " +
-                        "AND (:startDate IS NULL OR e.startDate >= :startDate)")
+    @Query("SELECT e FROM EventEntity e WHERE e.status = :status " +
+            "AND (:category IS NULL OR e.category = :category) " +
+            "AND (cast(:startDate as timestamp) IS NULL OR e.startDate >= :startDate)")
         Page<EventEntity> findPublicEvents(
                         @Param("status") EventStatus status,
                         @Param("category") String category,

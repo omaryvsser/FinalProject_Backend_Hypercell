@@ -13,3 +13,7 @@ databaseChangeLog:
       file: db/changelog/changelog-04-create-tickets-table.yaml
   - include:
       file: db/changelog/changelog-06-create-payments-table.yaml
+  - include:
+      file: db/changelog/changelog-08-add-image-url-to-events.yaml
+  - include:
+      file: db/changelog/changelog-09-seed-data.yaml
