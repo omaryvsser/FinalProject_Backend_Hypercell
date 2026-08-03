@@ -3,6 +3,7 @@ package com.hypercell.event_ticketing_platform.Repository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,4 +32,5 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
         // ده المنفذ اللي بيمسك الشروط دي ويبعتها للاستعلام اللي فوق عشان يتنفذ، ومعاهم
         // أداة الـ Pageable عشان ترجع النتائج مقسمة صفحات (Pagination) وما تتقلش
         // الموقنع.
+        Optional<EventEntity> findByIdAndOrganizerId(Long id, Long organizerId);
 }

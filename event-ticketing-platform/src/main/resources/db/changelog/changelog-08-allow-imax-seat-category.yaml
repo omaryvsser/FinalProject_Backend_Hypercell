@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 08-allow-imax-seat-category
+      author: backend-developer
+      changes:
+        - dropConstraint:
+            tableName: seat_categories
+            constraintName: seat_categories_name_check

@@ -2,8 +2,9 @@ package com.hypercell.event_ticketing_platform.DTO;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hypercell.event_ticketing_platform.Enum.EventStatus;
-import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,10 +28,10 @@ public class UpdateEventDto {
     @Size(max = 100, message = "Event category must not exceed 100 characters")
     private String category; // Updated event category
 
-    @Future(message = "Start date must be in the future") // Validates start date is in the future if updated
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S][XXX][X]")
     private LocalDateTime startDate; // Updated event start date and time
 
-    @Future(message = "End date must be in the future") // Validates end date is in the future if updated
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss[.SSS][.SS][.S][XXX][X]")
     private LocalDateTime endDate; // Updated event end date and time
 
     private EventStatus status; // Updated event status
