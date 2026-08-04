@@ -25,15 +25,18 @@ public class BookingService {
     private final SeatCategoryRepository seatCategoryRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final TicketService ticketService;
 
     public BookingService(BookingRepository bookingRepository,
             SeatCategoryRepository seatCategoryRepository,
             EventRepository eventRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            TicketService ticketService) {
         this.bookingRepository = bookingRepository;
         this.seatCategoryRepository = seatCategoryRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.ticketService = ticketService;
     }
 
     @Transactional
@@ -64,6 +67,9 @@ public class BookingService {
                 .build();
 
         BookingEntity savedBooking = bookingRepository.save(booking);
+
+        // Auto-generate tickets for this booking
+        ticketService.generateTicketsForBooking(savedBooking);
 
         BookingDto.Response dto = new BookingDto.Response();
         dto.setBookingId(savedBooking.getId());
