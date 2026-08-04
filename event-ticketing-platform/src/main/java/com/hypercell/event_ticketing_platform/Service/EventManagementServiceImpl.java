@@ -1,9 +1,6 @@
 package com.hypercell.event_ticketing_platform.Service;
 
-import com.hypercell.event_ticketing_platform.DTO.ChangeEventStatusDto;
-import com.hypercell.event_ticketing_platform.DTO.CreateEventDto;
-import com.hypercell.event_ticketing_platform.DTO.EventResponseDto;
-import com.hypercell.event_ticketing_platform.DTO.UpdateEventDto;
+import com.hypercell.event_ticketing_platform.DTO.EventDto;
 import com.hypercell.event_ticketing_platform.Entity.EventEntity;
 import com.hypercell.event_ticketing_platform.Entity.UserEntity;
 import com.hypercell.event_ticketing_platform.Entity.VenueEntity;
@@ -29,7 +26,7 @@ public class EventManagementServiceImpl implements EventManagementService {
 
     @Override
     @Transactional
-    public EventResponseDto createEvent(CreateEventDto createEventDto) {
+    public EventDto.Response createEvent(EventDto.CreateRequest createEventDto) {
         UserEntity currentUser = getAuthenticatedUser();
 
         VenueEntity venue = venueRepository.findById(createEventDto.getVenueId())
@@ -54,7 +51,7 @@ public class EventManagementServiceImpl implements EventManagementService {
 
     @Override
     @Transactional
-    public EventResponseDto updateEvent(Long eventId, UpdateEventDto updateEventDto) {
+    public EventDto.Response updateEvent(Long eventId, EventDto.UpdateRequest updateEventDto) {
         UserEntity currentUser = getAuthenticatedUser();
 
         EventEntity event = eventRepository.findById(eventId)
@@ -85,6 +82,9 @@ public class EventManagementServiceImpl implements EventManagementService {
                     .orElseThrow(() -> new ResourceNotFoundException("Venue not found with id: " + updateEventDto.getVenueId()));
             event.setVenue(venue);
         }
+        if (updateEventDto.getImageUrl() != null) {
+            event.setImageUrl(updateEventDto.getImageUrl());
+        }
 
         EventEntity updatedEvent = eventRepository.save(event);
         return mapToEventResponseDto(updatedEvent);
@@ -92,7 +92,7 @@ public class EventManagementServiceImpl implements EventManagementService {
 
     @Override
     @Transactional
-    public EventResponseDto changeEventStatus(Long eventId, ChangeEventStatusDto statusDto) {
+    public EventDto.Response changeEventStatus(Long eventId, EventDto.ChangeStatusRequest statusDto) {
         UserEntity currentUser = getAuthenticatedUser();
 
         EventEntity event = eventRepository.findById(eventId)
@@ -121,8 +121,8 @@ public class EventManagementServiceImpl implements EventManagementService {
         }
     }
 
-    private EventResponseDto mapToEventResponseDto(EventEntity event) {
-        return EventResponseDto.builder()
+    private EventDto.Response mapToEventResponseDto(EventEntity event) {
+        return EventDto.Response.builder()
                 .id(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
@@ -131,6 +131,7 @@ public class EventManagementServiceImpl implements EventManagementService {
                 .endDate(event.getEndDate())
                 .status(event.getStatus())
                 .venueName(event.getVenue() != null ? event.getVenue().getName() : null)
+                .imageUrl(event.getImageUrl())
                 .build();
     }
 }

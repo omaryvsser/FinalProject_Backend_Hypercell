@@ -1,7 +1,6 @@
 package com.hypercell.event_ticketing_platform.Service;
 
-import com.hypercell.event_ticketing_platform.DTO.BookingResponseDto;
-import com.hypercell.event_ticketing_platform.DTO.CreateBookingRequestDto;
+import com.hypercell.event_ticketing_platform.DTO.BookingDto;
 import com.hypercell.event_ticketing_platform.Entity.BookingEntity;
 import com.hypercell.event_ticketing_platform.Entity.EventEntity;
 import com.hypercell.event_ticketing_platform.Entity.SeatCategoryEntity;
@@ -38,7 +37,7 @@ public class BookingService {
     }
 
     @Transactional
-    public BookingResponseDto createBooking(CreateBookingRequestDto request) {
+    public BookingDto.Response createBooking(BookingDto.CreateRequest request) {
         UserEntity user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -66,7 +65,7 @@ public class BookingService {
 
         BookingEntity savedBooking = bookingRepository.save(booking);
 
-        BookingResponseDto dto = new BookingResponseDto();
+        BookingDto.Response dto = new BookingDto.Response();
         dto.setBookingId(savedBooking.getId());
         dto.setQuantity(savedBooking.getQuantity());
         dto.setStatus(savedBooking.getStatus());
@@ -105,11 +104,11 @@ public class BookingService {
         seatCategoryRepository.save(seatCategory);
     }
 
-    public List<BookingResponseDto> getUserBookings(Long userId) {
+    public List<BookingDto.Response> getUserBookings(Long userId) {
         List<BookingEntity> bookings = bookingRepository.findByUserId(userId);
 
         return bookings.stream().map(booking -> {
-            BookingResponseDto dto = new BookingResponseDto();
+            BookingDto.Response dto = new BookingDto.Response();
             dto.setBookingId(booking.getId());
             dto.setQuantity(booking.getQuantity());
             dto.setStatus(booking.getStatus());
@@ -131,11 +130,11 @@ public class BookingService {
         }).collect(Collectors.toList());
     }
 
-    public List<BookingResponseDto> getEventBookings(Long eventId) {
+    public List<BookingDto.Response> getEventBookings(Long eventId) {
         List<BookingEntity> bookings = bookingRepository.findByEventId(eventId);
 
         return bookings.stream().map(booking -> {
-            BookingResponseDto dto = new BookingResponseDto();
+            BookingDto.Response dto = new BookingDto.Response();
             dto.setBookingId(booking.getId());
             dto.setQuantity(booking.getQuantity());
             dto.setStatus(booking.getStatus());

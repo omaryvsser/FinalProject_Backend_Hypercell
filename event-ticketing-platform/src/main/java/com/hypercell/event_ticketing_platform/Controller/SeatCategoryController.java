@@ -1,8 +1,6 @@
 package com.hypercell.event_ticketing_platform.Controller;
 
-import com.hypercell.event_ticketing_platform.DTO.CreateSeatCategoryDto;
-import com.hypercell.event_ticketing_platform.DTO.SeatCategoryResponseDto;
-import com.hypercell.event_ticketing_platform.DTO.UpdateSeatCategoryDto;
+import com.hypercell.event_ticketing_platform.DTO.SeatCategoryDto;
 import com.hypercell.event_ticketing_platform.Service.SeatCategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,19 +18,19 @@ public class SeatCategoryController {
     private final SeatCategoryService seatCategoryService;
 
     @PostMapping
-    public ResponseEntity<SeatCategoryResponseDto> addSeatCategory(
+    public ResponseEntity<SeatCategoryDto.Response> addSeatCategory(
             @PathVariable Long eventId,
-            @Valid @RequestBody CreateSeatCategoryDto createSeatCategoryDto) {
-        SeatCategoryResponseDto response = seatCategoryService.addSeatCategory(eventId, createSeatCategoryDto);
+            @Valid @RequestBody SeatCategoryDto.CreateRequest createSeatCategoryDto) {
+        SeatCategoryDto.Response response = seatCategoryService.addSeatCategory(eventId, createSeatCategoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<SeatCategoryResponseDto> updateSeatCategory(
+    public ResponseEntity<SeatCategoryDto.Response> updateSeatCategory(
             @PathVariable Long eventId,
             @PathVariable Long categoryId,
-            @Valid @RequestBody UpdateSeatCategoryDto updateSeatCategoryDto) {
-        SeatCategoryResponseDto response = seatCategoryService.updateSeatCategory(eventId, categoryId, updateSeatCategoryDto);
+            @Valid @RequestBody SeatCategoryDto.UpdateRequest updateSeatCategoryDto) {
+        SeatCategoryDto.Response response = seatCategoryService.updateSeatCategory(eventId, categoryId, updateSeatCategoryDto);
         return ResponseEntity.ok(response);
     }
 
@@ -45,8 +43,8 @@ public class SeatCategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SeatCategoryResponseDto>> getSeatCategoriesByEventId(@PathVariable Long eventId) {
-        List<SeatCategoryResponseDto> response = seatCategoryService.getSeatCategoriesByEventId(eventId);
+    public ResponseEntity<List<SeatCategoryDto.Response>> getSeatCategoriesByEventId(@PathVariable Long eventId) {
+        List<SeatCategoryDto.Response> response = seatCategoryService.getSeatCategoriesByEventId(eventId);
         return ResponseEntity.ok(response);
     }
 }

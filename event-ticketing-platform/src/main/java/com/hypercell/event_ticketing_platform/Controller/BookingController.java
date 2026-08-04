@@ -5,8 +5,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.hypercell.event_ticketing_platform.DTO.BookingResponseDto;
-import com.hypercell.event_ticketing_platform.DTO.CreateBookingRequestDto;
+import com.hypercell.event_ticketing_platform.DTO.BookingDto;
 import com.hypercell.event_ticketing_platform.Service.BookingService;
 
 import jakarta.validation.Valid;
@@ -22,26 +21,23 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<BookingResponseDto> createBooking(@Valid @RequestBody CreateBookingRequestDto request) {
+    public ResponseEntity<BookingDto.Response> createBooking(@Valid @RequestBody BookingDto.CreateRequest request) {
         return ResponseEntity.ok(bookingService.createBooking(request));
     }
 
-    // بنحول بس ال حاله ال booking من pending ل cancelled
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<String> cancelBooking(@PathVariable Long id) {
         bookingService.cancelBooking(id);
         return ResponseEntity.ok("Booking cancelled successfully and seats restored.");
     }
 
-    // عرض حجوزات مستخدم معين
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<BookingResponseDto>> getUserBookings(@PathVariable Long userId) {
+    public ResponseEntity<List<BookingDto.Response>> getUserBookings(@PathVariable Long userId) {
         return ResponseEntity.ok(bookingService.getUserBookings(userId));
     }
 
-    // عرض الحجوزات ايفنت معين للادمن اوو اورجنيزر
     @GetMapping("/event/{eventId}")
-    public ResponseEntity<List<BookingResponseDto>> getEventBookings(@PathVariable Long eventId) {
+    public ResponseEntity<List<BookingDto.Response>> getEventBookings(@PathVariable Long eventId) {
         return ResponseEntity.ok(bookingService.getEventBookings(eventId));
     }
 }

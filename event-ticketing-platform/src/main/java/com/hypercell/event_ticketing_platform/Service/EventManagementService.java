@@ -1,15 +1,12 @@
 package com.hypercell.event_ticketing_platform.Service;
 
-import com.hypercell.event_ticketing_platform.DTO.ChangeEventStatusDto;
-import com.hypercell.event_ticketing_platform.DTO.CreateEventDto;
-import com.hypercell.event_ticketing_platform.DTO.EventResponseDto;
-import com.hypercell.event_ticketing_platform.DTO.UpdateEventDto;
+import com.hypercell.event_ticketing_platform.DTO.EventDto;
 
 public interface EventManagementService {
 
-    EventResponseDto createEvent(CreateEventDto createEventDto);
+    EventDto.Response createEvent(EventDto.CreateRequest createEventDto);
 
-    EventResponseDto updateEvent(Long eventId, UpdateEventDto updateEventDto);
+    EventDto.Response updateEvent(Long eventId, EventDto.UpdateRequest updateEventDto);
 
-    EventResponseDto changeEventStatus(Long eventId, ChangeEventStatusDto statusDto);
+    EventDto.Response changeEventStatus(Long eventId, EventDto.ChangeStatusRequest statusDto);
 }

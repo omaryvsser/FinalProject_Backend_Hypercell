@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hypercell.event_ticketing_platform.DTO.EventDetailDto;
-import com.hypercell.event_ticketing_platform.DTO.EventResponseDto;
-import com.hypercell.event_ticketing_platform.DTO.EventSearchFilterDto;
+import com.hypercell.event_ticketing_platform.DTO.EventDto;
 import com.hypercell.event_ticketing_platform.Service.SearchPublicEvents;
 
 import lombok.RequiredArgsConstructor;
@@ -23,12 +21,12 @@ public class EventPublicController {
     private final SearchPublicEvents searchPublicEvents;
 
     @GetMapping
-    public ResponseEntity<Page<EventResponseDto>> getpublicEvent(
+    public ResponseEntity<Page<EventDto.Response>> getpublicEvent(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String startDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        EventSearchFilterDto filterDto = new EventSearchFilterDto();
+        EventDto.SearchFilterRequest filterDto = new EventDto.SearchFilterRequest();
         filterDto.setCategory(category);
 
         if (startDate != null && !startDate.isEmpty()) {
@@ -38,13 +36,13 @@ public class EventPublicController {
         filterDto.setPage(page);
         filterDto.setSize(size);
 
-        Page<EventResponseDto> response = searchPublicEvents.searchevPage(filterDto);
+        Page<EventDto.Response> response = searchPublicEvents.searchevPage(filterDto);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventDetailDto> getEventDetails(@PathVariable Long id) {
-        EventDetailDto eventDetails = searchPublicEvents.getEventDetails(id);
+    public ResponseEntity<EventDto.DetailResponse> getEventDetails(@PathVariable Long id) {
+        EventDto.DetailResponse eventDetails = searchPublicEvents.getEventDetails(id);
         return ResponseEntity.ok(eventDetails);
     }
 }

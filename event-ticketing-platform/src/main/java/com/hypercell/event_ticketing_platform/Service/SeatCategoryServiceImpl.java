@@ -1,8 +1,6 @@
 package com.hypercell.event_ticketing_platform.Service;
 
-import com.hypercell.event_ticketing_platform.DTO.CreateSeatCategoryDto;
-import com.hypercell.event_ticketing_platform.DTO.SeatCategoryResponseDto;
-import com.hypercell.event_ticketing_platform.DTO.UpdateSeatCategoryDto;
+import com.hypercell.event_ticketing_platform.DTO.SeatCategoryDto;
 import com.hypercell.event_ticketing_platform.Entity.EventEntity;
 import com.hypercell.event_ticketing_platform.Entity.SeatCategoryEntity;
 import com.hypercell.event_ticketing_platform.Entity.UserEntity;
@@ -30,7 +28,7 @@ public class SeatCategoryServiceImpl implements SeatCategoryService {
 
     @Override
     @Transactional
-    public SeatCategoryResponseDto addSeatCategory(Long eventId, CreateSeatCategoryDto createSeatCategoryDto) {
+    public SeatCategoryDto.Response addSeatCategory(Long eventId, SeatCategoryDto.CreateRequest createSeatCategoryDto) {
         UserEntity currentUser = getAuthenticatedUser();
 
         EventEntity event = eventRepository.findById(eventId)
@@ -38,17 +36,14 @@ public class SeatCategoryServiceImpl implements SeatCategoryService {
 
         verifyOwnership(event, currentUser);
 
-        // Validate eventId consistency if eventId is provided in request body
         if (createSeatCategoryDto.getEventId() != null && !createSeatCategoryDto.getEventId().equals(eventId)) {
             throw new IllegalArgumentException("The eventId in the URL path (" + eventId + ") does not match the eventId in the request body (" + createSeatCategoryDto.getEventId() + ")");
         }
 
-        // Prevent duplicate seat category names for the same event
         if (seatCategoryRepository.existsByEventIdAndName(eventId, createSeatCategoryDto.getName())) {
             throw new ResourceAlreadyExistsException("Seat category '" + createSeatCategoryDto.getName() + "' already exists for event ID: " + eventId);
         }
 
-        // Business Logic: When a new seat category is created, set availableSeats equal to totalSeats
         SeatCategoryEntity seatCategory = SeatCategoryEntity.builder()
                 .name(createSeatCategoryDto.getName())
                 .price(createSeatCategoryDto.getPrice())
@@ -63,7 +58,7 @@ public class SeatCategoryServiceImpl implements SeatCategoryService {
 
     @Override
     @Transactional
-    public SeatCategoryResponseDto updateSeatCategory(Long eventId, Long categoryId, UpdateSeatCategoryDto updateSeatCategoryDto) {
+    public SeatCategoryDto.Response updateSeatCategory(Long eventId, Long categoryId, SeatCategoryDto.UpdateRequest updateSeatCategoryDto) {
         UserEntity currentUser = getAuthenticatedUser();
 
         EventEntity event = eventRepository.findById(eventId)
@@ -119,7 +114,7 @@ public class SeatCategoryServiceImpl implements SeatCategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SeatCategoryResponseDto> getSeatCategoriesByEventId(Long eventId) {
+    public List<SeatCategoryDto.Response> getSeatCategoriesByEventId(Long eventId) {
         if (!eventRepository.existsById(eventId)) {
             throw new ResourceNotFoundException("Event not found with id: " + eventId);
         }
@@ -145,8 +140,8 @@ public class SeatCategoryServiceImpl implements SeatCategoryService {
         }
     }
 
-    private SeatCategoryResponseDto mapToSeatCategoryResponseDto(SeatCategoryEntity seatCategory) {
-        return SeatCategoryResponseDto.builder()
+    private SeatCategoryDto.Response mapToSeatCategoryResponseDto(SeatCategoryEntity seatCategory) {
+        return SeatCategoryDto.Response.builder()
                 .id(seatCategory.getId())
                 .name(seatCategory.getName())
                 .price(seatCategory.getPrice())

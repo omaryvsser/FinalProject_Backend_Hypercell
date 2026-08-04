@@ -1,18 +1,16 @@
 package com.hypercell.event_ticketing_platform.Service;
 
-import com.hypercell.event_ticketing_platform.DTO.CreateSeatCategoryDto;
-import com.hypercell.event_ticketing_platform.DTO.SeatCategoryResponseDto;
-import com.hypercell.event_ticketing_platform.DTO.UpdateSeatCategoryDto;
+import com.hypercell.event_ticketing_platform.DTO.SeatCategoryDto;
 
 import java.util.List;
 
 public interface SeatCategoryService {
 
-    SeatCategoryResponseDto addSeatCategory(Long eventId, CreateSeatCategoryDto createSeatCategoryDto);
+    SeatCategoryDto.Response addSeatCategory(Long eventId, SeatCategoryDto.CreateRequest createSeatCategoryDto);
 
-    SeatCategoryResponseDto updateSeatCategory(Long eventId, Long categoryId, UpdateSeatCategoryDto updateSeatCategoryDto);
+    SeatCategoryDto.Response updateSeatCategory(Long eventId, Long categoryId, SeatCategoryDto.UpdateRequest updateSeatCategoryDto);
 
     void deleteSeatCategory(Long eventId, Long categoryId);
 
-    List<SeatCategoryResponseDto> getSeatCategoriesByEventId(Long eventId);
+    List<SeatCategoryDto.Response> getSeatCategoriesByEventId(Long eventId);
 }

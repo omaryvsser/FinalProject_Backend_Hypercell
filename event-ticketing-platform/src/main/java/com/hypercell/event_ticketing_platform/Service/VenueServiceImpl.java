@@ -5,8 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hypercell.event_ticketing_platform.DTO.CreateVenueDto;
-import com.hypercell.event_ticketing_platform.DTO.UpdateVenueDto;
 import com.hypercell.event_ticketing_platform.DTO.VenueDto;
 import com.hypercell.event_ticketing_platform.Entity.VenueEntity;
 import com.hypercell.event_ticketing_platform.Exception.ResourceAlreadyExistsException;
@@ -24,7 +22,7 @@ public class VenueServiceImpl implements VenueService {
 
     @Override
     @Transactional
-    public CreateVenueDto addVenue(CreateVenueDto venueDto) {
+    public VenueDto.Response addVenue(VenueDto.CreateRequest venueDto) {
         // Check if a venue with the same name already exists
         if (venueRepository.existsByName(venueDto.getName())) {
             throw new ResourceAlreadyExistsException("Venue with name '" + venueDto.getName() + "' already exists");
@@ -40,27 +38,20 @@ public class VenueServiceImpl implements VenueService {
         // Save entity
         VenueEntity savedVenue = venueRepository.save(venue);
 
-        // Create New Object From CreateVenueDto
-        return CreateVenueDto.builder()
-                .name(savedVenue.getName())
-                .address(savedVenue.getAddress())
-                .capacity(savedVenue.getCapacity())
-                .build(); // Object Creation Finished
+        return mapToVenueDto(savedVenue);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<VenueDto> getAllVenues() {
-        // Fetch all venues and map each entity to DTO using Java Streams
-        return venueRepository.findAll().stream() // Stream for Looping Every Venue
+    public List<VenueDto.Response> getAllVenues() {
+        return venueRepository.findAll().stream()
                 .map(this::mapToVenueDto) 
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public VenueDto getVenueById(Long id) {
-        // Find venue by ID or throw exception if not found
+    public VenueDto.Response getVenueById(Long id) {
         VenueEntity venue = venueRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Venue not found with id: " + id));
 
@@ -69,17 +60,14 @@ public class VenueServiceImpl implements VenueService {
 
     @Override
     @Transactional
-    public VenueDto updateVenue(Long id, UpdateVenueDto venueDto) {
-        // Find existing venue by ID or throw exception
+    public VenueDto.Response updateVenue(Long id, VenueDto.UpdateRequest venueDto) {
         VenueEntity venue = venueRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Venue not found with id: " + id));
 
-        // Check if updated name conflicts with another venue
         if (venueDto.getName() != null && venueRepository.existsByNameAndIdNot(venueDto.getName(), id)) {
             throw new ResourceAlreadyExistsException("Venue with name '" + venueDto.getName() + "' already exists");
         }
 
-        // Update entity fields if non-null
         if (venueDto.getName() != null) {
             venue.setName(venueDto.getName());
         }
@@ -90,27 +78,21 @@ public class VenueServiceImpl implements VenueService {
             venue.setCapacity(venueDto.getCapacity());
         }
 
-        // Save updated entity
         VenueEntity updatedVenue = venueRepository.save(venue);
-
         return mapToVenueDto(updatedVenue);
     }
 
     @Override
     @Transactional
     public void deleteVenue(Long id) {
-        // Verify venue existence before deletion
         if (!venueRepository.existsById(id)) {
             throw new ResourceNotFoundException("Venue not found with id: " + id);
         }
-
-        // Delete venue by ID
         venueRepository.deleteById(id);
     }
 
-    // Helper method to map VenueEntity to VenueDto manually
-    private VenueDto mapToVenueDto(VenueEntity venue) {
-        return VenueDto.builder()
+    private VenueDto.Response mapToVenueDto(VenueEntity venue) {
+        return VenueDto.Response.builder()
                 .id(venue.getId())
                 .name(venue.getName())
                 .address(venue.getAddress())

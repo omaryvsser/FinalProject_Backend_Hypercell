@@ -1,8 +1,6 @@
 package com.hypercell.event_ticketing_platform.Service;
 
-import com.hypercell.event_ticketing_platform.DTO.EventDetailDto;
-import com.hypercell.event_ticketing_platform.DTO.EventResponseDto;
-import com.hypercell.event_ticketing_platform.DTO.EventSearchFilterDto;
+import com.hypercell.event_ticketing_platform.DTO.EventDto;
 import com.hypercell.event_ticketing_platform.Enum.EventStatus;
 import com.hypercell.event_ticketing_platform.Exception.ResourceNotFoundException;
 import com.hypercell.event_ticketing_platform.Entity.EventEntity;
@@ -22,7 +20,7 @@ public class SearchPublicEvents {
 
     private final EventRepository eventRepository;
 
-    public Page<EventResponseDto> searchevPage(EventSearchFilterDto filterDto) {
+    public Page<EventDto.Response> searchevPage(EventDto.SearchFilterRequest filterDto) {
         Pageable pageable = PageRequest.of(filterDto.getPage(), filterDto.getSize(), Sort.by("startDate").ascending());
 
         Page<EventEntity> eventEntities = eventRepository.findPublicEvents(
@@ -31,7 +29,7 @@ public class SearchPublicEvents {
                 filterDto.getStartDate(),
                 pageable);
 
-        return eventEntities.map(event -> EventResponseDto.builder()
+        return eventEntities.map(event -> EventDto.Response.builder()
                 .id(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
@@ -44,11 +42,11 @@ public class SearchPublicEvents {
                 .build());
     }
 
-    public EventDetailDto getEventDetails(Long eventId) {
+    public EventDto.DetailResponse getEventDetails(Long eventId) {
         EventEntity event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
 
-        return EventDetailDto.builder()
+        return EventDto.DetailResponse.builder()
                 .id(event.getId())
                 .title(event.getTitle())
                 .description(event.getDescription())
@@ -61,11 +59,11 @@ public class SearchPublicEvents {
                 .venueAddress(event.getVenue() != null ? event.getVenue().getAddress() : null)
                 .seatCategories(
                         event.getSeatCategories().stream()
-                                .map(seatCategory -> EventDetailDto.SeatCategoryDto.builder()
+                                .map(seatCategory -> EventDto.DetailResponse.SeatCategoryResponse.builder()
                                         .id(seatCategory.getId())
                                         .categoryName(seatCategory.getName())
-                                        .price(seatCategory.getPrice())                                          
-
+                                        .price(seatCategory.getPrice())
+                                        .availableSeats(seatCategory.getAvailableSeats())
                                         .build())
                                 .toList())
                 .build();
