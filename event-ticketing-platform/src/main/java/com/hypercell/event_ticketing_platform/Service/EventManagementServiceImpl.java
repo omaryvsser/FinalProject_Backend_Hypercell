@@ -116,7 +116,7 @@ public class EventManagementServiceImpl implements EventManagementService {
     }
 
     private void verifyOwnership(EventEntity event, UserEntity currentUser) {
-        if (!event.getOrganizer().getId().equals(currentUser.getId())) {
+        if (!"ADMIN".equals(currentUser.getRole().name()) && !event.getOrganizer().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not authorized to manage this event");
         }
     }
