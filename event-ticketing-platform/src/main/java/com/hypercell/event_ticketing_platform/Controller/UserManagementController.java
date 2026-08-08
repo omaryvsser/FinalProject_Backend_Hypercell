@@ -1,14 +1,22 @@
 package com.hypercell.event_ticketing_platform.Controller;
 
-import com.hypercell.event_ticketing_platform.DTO.UserManagementDto;
-import com.hypercell.event_ticketing_platform.Service.UserManagementService;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
 import java.security.Principal;
 import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hypercell.event_ticketing_platform.DTO.UserManagementDto;
+import com.hypercell.event_ticketing_platform.Service.UserManagementService;
+
+import jakarta.validation.Valid;
 
 /**
  * REST Controller exposing administrative User Management endpoints.
@@ -64,5 +72,16 @@ public class UserManagementController {
         String currentAdminUsername = (principal != null) ? principal.getName() : null;
         UserManagementDto.Response updatedUser = userManagementService.changeUserRole(id, request, currentAdminUsername);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    /**
+     * DELETE /api/admin/users/{id}
+     * Deletes a user account.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id, Principal principal) {
+        String currentAdminUsername = (principal != null) ? principal.getName() : null;
+        userManagementService.deleteUser(id, currentAdminUsername);
+        return ResponseEntity.noContent().build();
     }
 }

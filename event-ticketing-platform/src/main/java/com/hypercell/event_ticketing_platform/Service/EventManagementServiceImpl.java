@@ -27,6 +27,8 @@ public class EventManagementServiceImpl implements EventManagementService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final VenueRepository venueRepository;
+    private final com.hypercell.event_ticketing_platform.Repository.BookingRepository bookingRepository;
+    private final com.hypercell.event_ticketing_platform.Repository.TicketRepository ticketRepository;
 
     @Override
     public Page<EventDto.Response> getAllEvents(int page, int size) {
@@ -46,22 +48,22 @@ public class EventManagementServiceImpl implements EventManagementService {
     public EventDto.Response createEvent(EventDto.CreateRequest createEventDto) {
         UserEntity currentUser = getAuthenticatedUser();
 
-        // 🟢 Dynamic Venue Resolution
+        // 🟢 Dynamic Venue Resolution: Check venueId first to avoid duplicate venue inserts
         VenueEntity venue;
-        if (createEventDto.getVenueName() != null && !createEventDto.getVenueName().isBlank()) {
-            venue = venueRepository.findByNameIgnoreCase(createEventDto.getVenueName())
-                    .orElseGet(() -> venueRepository.save(
-                            VenueEntity.builder()
-                                    .name(createEventDto.getVenueName())
-                                    .address(createEventDto.getVenueName()) // Default fallback address
-                                    .build()
-                    ));
-        } else if (createEventDto.getVenueId() != null) {
+        if (createEventDto.getVenueId() != null) {
             venue = venueRepository.findById(createEventDto.getVenueId())
                     .orElseThrow(() -> new ResourceNotFoundException("Venue not found with id: " + createEventDto.getVenueId()));
+        } else if (createEventDto.getVenueName() != null && !createEventDto.getVenueName().isBlank()) {
+            venue = venueRepository.findByNameIgnoreCase(createEventDto.getVenueName().trim())
+                    .orElseGet(() -> venueRepository.save(
+                            VenueEntity.builder()
+                                    .name(createEventDto.getVenueName().trim())
+                                    .address(createEventDto.getVenueName().trim())
+                                    .capacity(500)
+                                    .build()
+                    ));
         } else {
-            // Default fallback if neither is provided
-            venue = venueRepository.findById(1L)
+            venue = venueRepository.findAll().stream().findFirst()
                     .orElseThrow(() -> new ResourceNotFoundException("Default venue not found"));
         }
 
@@ -191,6 +193,18 @@ public class EventManagementServiceImpl implements EventManagementService {
 
         // Ensures only the owner (or ADMIN) can delete it
         verifyOwnership(event, currentUser);
+
+        // Clean up linked bookings and tickets for this event to avoid FK constraint violations
+        var bookings = bookingRepository.findByEventId(eventId);
+        if (bookings != null && !bookings.isEmpty()) {
+            for (var b : bookings) {
+                var tickets = ticketRepository.findByBookingUserId(b.getUser().getId());
+                if (tickets != null && !tickets.isEmpty()) {
+                    ticketRepository.deleteAll(tickets);
+                }
+            }
+            bookingRepository.deleteAll(bookings);
+        }
 
         eventRepository.delete(event);
     }

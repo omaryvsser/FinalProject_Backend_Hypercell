@@ -15,9 +15,11 @@ import com.hypercell.event_ticketing_platform.Repository.VenueRepository;
 public class VenueServiceImpl implements VenueService {
 
     private final VenueRepository venueRepository;
+    private final com.hypercell.event_ticketing_platform.Repository.EventRepository eventRepository;
 
-    public VenueServiceImpl(VenueRepository venueRepository) {
+    public VenueServiceImpl(VenueRepository venueRepository, com.hypercell.event_ticketing_platform.Repository.EventRepository eventRepository) {
         this.venueRepository = venueRepository;
+        this.eventRepository = eventRepository;
     }
 
     @Override
@@ -85,10 +87,15 @@ public class VenueServiceImpl implements VenueService {
     @Override
     @Transactional
     public void deleteVenue(Long id) {
-        if (!venueRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Venue not found with id: " + id);
+        VenueEntity venue = venueRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found with id: " + id));
+
+        java.util.List<com.hypercell.event_ticketing_platform.Entity.EventEntity> events = eventRepository.findByVenueId(id);
+        if (events != null && !events.isEmpty()) {
+            eventRepository.deleteAll(events);
         }
-        venueRepository.deleteById(id);
+
+        venueRepository.delete(venue);
     }
 
     private VenueDto.Response mapToVenueDto(VenueEntity venue) {

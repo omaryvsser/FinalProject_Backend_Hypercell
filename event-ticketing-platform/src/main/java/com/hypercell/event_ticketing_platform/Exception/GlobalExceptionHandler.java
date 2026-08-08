@@ -108,15 +108,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
-    // Handle RAW database constraint violations - e.g., unique email in DB (HTTP 409)
+    // Handle RAW database constraint violations (HTTP 409)
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrityViolationException(
             DataIntegrityViolationException ex, HttpServletRequest request) {
 
+        String errorMsg = "A database constraint violation occurred.";
+        String mostSpecific = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : "";
+        if (mostSpecific.toLowerCase().contains("value too long")) {
+            errorMsg = "Uploaded data or image poster size exceeds database limits.";
+        } else if (mostSpecific.toLowerCase().contains("unique") || mostSpecific.toLowerCase().contains("already exists")) {
+            errorMsg = "A record with this unique identifier or name already exists.";
+        } else if (mostSpecific.toLowerCase().contains("foreign key") || mostSpecific.toLowerCase().contains("violates foreign key")) {
+            errorMsg = "Cannot complete operation due to linked database records.";
+        }
+
         Map<String, Object> response = buildErrorResponseBody(
                 HttpStatus.CONFLICT,
                 "Database Conflict",
-                "A record with this unique identifier already exists.",
+                errorMsg,
                 request.getRequestURI()
         );
 

@@ -26,7 +26,47 @@ public class DatabaseSeeder {
     @Bean
     public CommandLineRunner seedDatabase() {
         return args -> {
-            // ✅ Only skip if admin user already exists in the database
+            // ✅ Always ensure admin@hypercell.com has ADMIN role
+            userRepository.findByEmail("admin@hypercell.com").ifPresentOrElse(
+                user -> {
+                    if (user.getRole() != UserRole.ADMIN) {
+                        user.setRole(UserRole.ADMIN);
+                        userRepository.save(user);
+                        System.out.println("✅ Updated admin@hypercell.com role to ADMIN.");
+                    }
+                },
+                () -> {
+                    userRepository.save(UserEntity.builder()
+                            .username("System Admin")
+                            .email("admin@hypercell.com")
+                            .password(passwordEncoder.encode("0000000000"))
+                            .role(UserRole.ADMIN)
+                            .build());
+                    System.out.println("✅ Seeded admin@hypercell.com with ADMIN role.");
+                }
+            );
+
+            // ✅ Always ensure organizer1@hypercell.com has ORGANIZER role
+            userRepository.findByEmail("organizer1@hypercell.com").ifPresentOrElse(
+                user -> {
+                    if (user.getRole() != UserRole.ORGANIZER) {
+                        user.setRole(UserRole.ORGANIZER);
+                        userRepository.save(user);
+                        System.out.println("✅ Updated organizer1@hypercell.com role to ORGANIZER.");
+                    }
+                },
+                () -> {
+                    userRepository.save(UserEntity.builder()
+                            .username("Organizer One")
+                            .email("organizer1@hypercell.com")
+                            .password(passwordEncoder.encode("password123"))
+                            .role(UserRole.ORGANIZER)
+                            .build());
+                    System.out.println("✅ Seeded organizer1@hypercell.com with ORGANIZER role.");
+                }
+            );
+
+            // ✅ Skip rest if seed data already exists
             if (userRepository.existsByEmail("admin@ticketing.com")) {
                 System.out.println("ℹ️ Seed data already exists, skipping database seeder.");
                 return;

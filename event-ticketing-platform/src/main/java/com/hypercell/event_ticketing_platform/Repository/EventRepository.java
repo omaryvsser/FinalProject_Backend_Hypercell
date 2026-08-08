@@ -34,4 +34,5 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
         // الموقنع.
         Optional<EventEntity> findByIdAndOrganizerId(Long id, Long organizerId);
         Page<EventEntity> findByOrganizerId(Long organizerId, Pageable pageable);
+        java.util.List<EventEntity> findByVenueId(Long venueId);
 }

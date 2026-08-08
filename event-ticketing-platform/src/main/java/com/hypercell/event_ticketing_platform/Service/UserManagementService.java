@@ -20,12 +20,15 @@ import com.hypercell.event_ticketing_platform.Repository.UserRepository;
 public class UserManagementService {
 
     private final UserRepository userRepository;
+    private final com.hypercell.event_ticketing_platform.Repository.BookingRepository bookingRepository;
+    private final com.hypercell.event_ticketing_platform.Repository.TicketRepository ticketRepository;
 
-    /**
-     * Explicit Constructor Injection for clean testability and loose coupling.
-     */
-    public UserManagementService(UserRepository userRepository) {
+    public UserManagementService(UserRepository userRepository,
+                                 com.hypercell.event_ticketing_platform.Repository.BookingRepository bookingRepository,
+                                 com.hypercell.event_ticketing_platform.Repository.TicketRepository ticketRepository) {
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     /**
@@ -79,6 +82,34 @@ public class UserManagementService {
 
         // 5. Map and return response DTO
         return mapToResponse(updatedUser);
+    }
+
+    /**
+     * Deletes a user entity from persistence.
+     * Prevents admin self-deletion.
+     */
+    @Transactional
+    public void deleteUser(Long targetUserId, String currentAdminUsername) {
+        UserEntity targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + targetUserId));
+
+        if (currentAdminUsername != null &&
+           (currentAdminUsername.equalsIgnoreCase(targetUser.getUsername()) || currentAdminUsername.equalsIgnoreCase(targetUser.getEmail()))) {
+            throw new IllegalArgumentException("Action Denied: Admin cannot delete their own account.");
+        }
+
+        // Clean up linked tickets and bookings to prevent FK violation
+        var tickets = ticketRepository.findByBookingUserId(targetUserId);
+        if (tickets != null && !tickets.isEmpty()) {
+            ticketRepository.deleteAll(tickets);
+        }
+
+        var bookings = bookingRepository.findByUserId(targetUserId);
+        if (bookings != null && !bookings.isEmpty()) {
+            bookingRepository.deleteAll(bookings);
+        }
+
+        userRepository.delete(targetUser);
     }
 
     /**
