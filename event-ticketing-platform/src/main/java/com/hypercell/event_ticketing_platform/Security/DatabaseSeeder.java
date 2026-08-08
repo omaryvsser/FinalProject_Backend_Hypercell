@@ -26,11 +26,13 @@ public class DatabaseSeeder {
     @Bean
     public CommandLineRunner seedDatabase() {
         return args -> {
-            if (userRepository.count() > 0) {
-                return; // Seed data already exists
+            // ✅ Only skip if admin user already exists in the database
+            if (userRepository.existsByEmail("admin@ticketing.com")) {
+                System.out.println("ℹ️ Seed data already exists, skipping database seeder.");
+                return;
             }
 
-            // 1. Seed Users (with encoded passwords)
+            // 1. Seed Users (with BCrypt-encoded passwords)
             UserEntity admin = userRepository.save(UserEntity.builder()
                     .username("admin_user")
                     .email("admin@ticketing.com")

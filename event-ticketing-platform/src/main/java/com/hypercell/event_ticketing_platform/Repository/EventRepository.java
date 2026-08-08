@@ -33,4 +33,5 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
         // أداة الـ Pageable عشان ترجع النتائج مقسمة صفحات (Pagination) وما تتقلش
         // الموقنع.
         Optional<EventEntity> findByIdAndOrganizerId(Long id, Long organizerId);
+        Page<EventEntity> findByOrganizerId(Long organizerId, Pageable pageable);
 }

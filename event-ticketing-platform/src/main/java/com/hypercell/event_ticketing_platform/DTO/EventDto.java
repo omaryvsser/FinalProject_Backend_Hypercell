@@ -55,8 +55,12 @@ public class EventDto {
 
         private EventStatus status;
 
-        @NotNull(message = "Venue ID is required")
+
         private Long venueId;
+        private String venueName;
+
+
+        private String imageUrl;
     }
 
     /**
@@ -88,7 +92,7 @@ public class EventDto {
 
         private Long venueId;
 
-        @Size(max = 500, message = "Image URL must not exceed 500 characters")
+
         private String imageUrl;
     }
 

@@ -39,7 +39,8 @@ public class EventEntity {
     @Column(nullable = false, length = 50)
     private EventStatus status;
 
-    @Column(name = "image_url", length = 500)
+
+    @Column(name = "image_url", columnDefinition = "LONGTEXT")
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

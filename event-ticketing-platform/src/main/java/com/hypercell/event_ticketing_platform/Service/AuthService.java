@@ -12,6 +12,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -46,7 +49,12 @@ public class AuthService {
                 .roles(user.getRole().name())
                 .build();
 
-        var jwtToken = jwtService.generateToken(userDetails);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("userId", user.getId());
+        claims.put("role", user.getRole().name());
+
+        var jwtToken = jwtService.generateToken(claims, userDetails);
         return AuthResponse.builder().token(jwtToken).build();
     }
 
@@ -63,7 +71,12 @@ public class AuthService {
                 .roles(user.getRole() != null ? user.getRole().name() : "USER")
                 .build();
 
-        var jwtToken = jwtService.generateToken(userDetails);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("userId", user.getId());
+        claims.put("role", user.getRole() != null ? user.getRole().name() : "USER");
+
+        var jwtToken = jwtService.generateToken(claims, userDetails);
         return AuthResponse.builder().token(jwtToken).build();
     }
 }

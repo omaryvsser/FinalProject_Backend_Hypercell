@@ -1,10 +1,12 @@
 package com.hypercell.event_ticketing_platform.Security;
 
+import com.hypercell.event_ticketing_platform.Entity.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +35,24 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        // 🔑 1. Extract custom fields if UserDetails is an instance of your custom User entity
+        if (userDetails instanceof UserEntity user) {
+            extraClaims.put("userId", user.getId());
+            if (user.getRole() != null) {
+                extraClaims.put("role", user.getRole().name()); // "CUSTOMER", "ORGANIZER", or "ADMIN"
+            }
+        } else {
+            // 🔑 2. Fallback: Extract role from Authorities list
+            String primaryRole = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .findFirst()
+                    .orElse("CUSTOMER")
+                    .replace("ROLE_", "");
+            extraClaims.put("role", primaryRole);
+        }
+        return generateToken(extraClaims, userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
