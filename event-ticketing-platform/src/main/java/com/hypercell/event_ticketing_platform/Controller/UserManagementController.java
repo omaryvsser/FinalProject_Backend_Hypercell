@@ -39,10 +39,7 @@ public class UserManagementController {
     /**
      * GET /api/admin/users
      * Retrieves all registered system users.
-     * 
      * Security Guard: Accessible only by ADMINs via class-level @PreAuthorize.
-     * 
-     * @return 200 OK with List of UserManagementDto.Response payloads.
      */
     @GetMapping
     public ResponseEntity<List<UserManagementDto.Response>> getAllUsers() {
@@ -53,15 +50,9 @@ public class UserManagementController {
     /**
      * PUT /api/admin/users/{id}/role
      * Updates the role of a specified user.
-     * 
      * Security & Context Extraction:
      * Extracts the active admin's username/email from the Principal object to prevent
      * self-demotion edge-cases inside the service layer.
-     * 
-     * @param id Target User ID.
-     * @param request Validated Request body containing newRole.
-     * @param principal Currently authenticated security principal.
-     * @return 200 OK with updated UserManagementDto.Response.
      */
     @PutMapping("/{id}/role")
     public ResponseEntity<UserManagementDto.Response> changeUserRole(

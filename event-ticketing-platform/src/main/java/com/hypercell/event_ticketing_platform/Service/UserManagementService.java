@@ -24,8 +24,8 @@ public class UserManagementService {
     private final com.hypercell.event_ticketing_platform.Repository.TicketRepository ticketRepository;
 
     public UserManagementService(UserRepository userRepository,
-                                 com.hypercell.event_ticketing_platform.Repository.BookingRepository bookingRepository,
-                                 com.hypercell.event_ticketing_platform.Repository.TicketRepository ticketRepository) {
+        com.hypercell.event_ticketing_platform.Repository.BookingRepository bookingRepository,
+        com.hypercell.event_ticketing_platform.Repository.TicketRepository ticketRepository) {
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.ticketRepository = ticketRepository;
@@ -33,8 +33,6 @@ public class UserManagementService {
 
     /**
      * Fetches all registered users from persistence and converts them to secure Response DTOs.
-     * 
-     * @return List of UserManagementDto.Response containing safe user metadata.
      */
     @Transactional(readOnly = true)
     public List<UserManagementDto.Response> getAllUsers() {
@@ -46,15 +44,9 @@ public class UserManagementService {
 
     /**
      * Updates the access role of a specified user entity.
-     * 
      * Edge Case & Guard Prevention:
      * Validates that the active admin username/email does not match the target user ID,
      * protecting the platform against accidental self-demotion or self-lockout.
-     * 
-     * @param targetUserId ID of the target user to modify.
-     * @param request DTO payload containing the new role string.
-     * @param currentAdminUsername Email or username of the authenticated admin performing the operation.
-     * @return Updated user details represented as UserManagementDto.Response.
      */
     @Transactional
     public UserManagementDto.Response changeUserRole(Long targetUserId, UserManagementDto.Request request, String currentAdminUsername) {
@@ -64,14 +56,23 @@ public class UserManagementService {
 
         // 2. Edge-Case Prevention: Block admin self-demotion
         if (currentAdminUsername != null &&
-           (currentAdminUsername.equalsIgnoreCase(targetUser.getUsername()) || currentAdminUsername.equalsIgnoreCase(targetUser.getEmail()))) {
+        (currentAdminUsername.equalsIgnoreCase(targetUser.getUsername()) || currentAdminUsername.equalsIgnoreCase(targetUser.getEmail()))) {
             throw new IllegalArgumentException("Action Denied: Admin cannot modify their own role to prevent accidental self-demotion.");
         }
 
         // 3. Convert incoming role string to valid UserRole enum
+        if (request == null || request.getNewRole() == null || request.getNewRole().trim().isEmpty()) {
+            throw new IllegalArgumentException("New role must not be blank");
+        }
+
+        String rawRole = request.getNewRole().trim().toUpperCase();
+        if (rawRole.startsWith("ROLE_")) {
+            rawRole = rawRole.substring(5);
+        }
+
         UserRole newRoleEnum;
         try {
-            newRoleEnum = UserRole.valueOf(request.getNewRole().trim().toUpperCase());
+            newRoleEnum = UserRole.valueOf(rawRole);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid user role: '" + request.getNewRole() + "'. Accepted values are: CUSTOMER, ORGANIZER, ADMIN");
         }
@@ -94,7 +95,7 @@ public class UserManagementService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + targetUserId));
 
         if (currentAdminUsername != null &&
-           (currentAdminUsername.equalsIgnoreCase(targetUser.getUsername()) || currentAdminUsername.equalsIgnoreCase(targetUser.getEmail()))) {
+        (currentAdminUsername.equalsIgnoreCase(targetUser.getUsername()) || currentAdminUsername.equalsIgnoreCase(targetUser.getEmail()))) {
             throw new IllegalArgumentException("Action Denied: Admin cannot delete their own account.");
         }
 

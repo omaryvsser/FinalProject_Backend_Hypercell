@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,12 +27,14 @@ public class EventManagementController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
     public ResponseEntity<EventDto.Response> createEvent(@Valid @RequestBody EventDto.CreateRequest createEventDto) {
         EventDto.Response createdEvent = eventManagementService.createEvent(createEventDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEvent);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
     public ResponseEntity<EventDto.Response> updateEvent(
             @PathVariable Long id,
             @Valid @RequestBody EventDto.UpdateRequest updateEventDto) {
@@ -40,13 +43,16 @@ public class EventManagementController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
     public ResponseEntity<EventDto.Response> changeEventStatus(
             @PathVariable Long id,
             @Valid @RequestBody EventDto.ChangeStatusRequest statusDto) {
         EventDto.Response updatedEvent = eventManagementService.changeEventStatus(id, statusDto);
         return ResponseEntity.ok(updatedEvent);
     }
+
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         eventManagementService.deleteEvent(id);
         return ResponseEntity.noContent().build();

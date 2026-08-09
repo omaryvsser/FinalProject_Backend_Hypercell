@@ -2,11 +2,10 @@ package com.hypercell.event_ticketing_platform.Controller;
 
 import com.hypercell.event_ticketing_platform.DTO.TicketPaymentDtos.TicketDto;
 import com.hypercell.event_ticketing_platform.Service.TicketService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/tickets")

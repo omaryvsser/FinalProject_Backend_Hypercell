@@ -1,9 +1,11 @@
 package com.hypercell.event_ticketing_platform.Repository;
 
-import com.hypercell.event_ticketing_platform.Entity.UserEntity;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import java.util.Optional;
+
+import com.hypercell.event_ticketing_platform.Entity.UserEntity;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
