@@ -76,6 +76,9 @@ public class EventManagementServiceImpl implements EventManagementService {
                 .startDate(createEventDto.getStartDate())
                 .endDate(createEventDto.getEndDate())
                 .status(status)
+                .director(createEventDto.getDirector())
+                .durationMinutes(createEventDto.getDurationMinutes())
+                .language(createEventDto.getLanguage())
                 .organizer(currentUser)
                 .venue(venue)
                 .imageUrl(createEventDto.getImageUrl())
@@ -112,6 +115,15 @@ public class EventManagementServiceImpl implements EventManagementService {
         }
         if (updateEventDto.getStatus() != null) {
             event.setStatus(updateEventDto.getStatus());
+        }
+        if (updateEventDto.getDirector() != null) {
+            event.setDirector(updateEventDto.getDirector());
+        }
+        if (updateEventDto.getDurationMinutes() != null) {
+            event.setDurationMinutes(updateEventDto.getDurationMinutes());
+        }
+        if (updateEventDto.getLanguage() != null) {
+            event.setLanguage(updateEventDto.getLanguage());
         }
         if (updateEventDto.getVenueId() != null) {
             VenueEntity venue = venueRepository.findById(updateEventDto.getVenueId())
@@ -166,6 +178,9 @@ public class EventManagementServiceImpl implements EventManagementService {
                 .startDate(event.getStartDate())
                 .endDate(event.getEndDate())
                 .status(event.getStatus())
+                .director(event.getDirector())
+                .durationMinutes(event.getDurationMinutes())
+                .language(event.getLanguage())
                 .venueName(event.getVenue() != null ? event.getVenue().getName() : null)
                 .imageUrl(event.getImageUrl())
                 .build();
@@ -179,6 +194,9 @@ public class EventManagementServiceImpl implements EventManagementService {
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
                 .status(entity.getStatus()) // 🟢 Direct EventStatus enum assignment
+                .director(entity.getDirector())
+                .durationMinutes(entity.getDurationMinutes())
+                .language(entity.getLanguage())
                 .venueName(entity.getVenue() != null ? entity.getVenue().getName() : null)
                 .imageUrl(entity.getImageUrl())
                 .build();

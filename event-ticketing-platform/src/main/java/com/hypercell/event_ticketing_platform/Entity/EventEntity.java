@@ -39,6 +39,14 @@ public class EventEntity {
     @Column(nullable = false, length = 50)
     private EventStatus status;
 
+    @Column(length = 150)
+    private String director;
+
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes;
+
+    @Column(length = 100)
+    private String language;
 
     @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;

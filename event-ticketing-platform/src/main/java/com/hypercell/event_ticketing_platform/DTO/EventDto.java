@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hypercell.event_ticketing_platform.Enum.EventStatus;
 import com.hypercell.event_ticketing_platform.Enum.SeatCategoryName;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -55,6 +56,14 @@ public class EventDto {
 
         private EventStatus status;
 
+        @Size(max = 150, message = "Director name must not exceed 150 characters")
+        private String director;
+
+        @Min(value = 1, message = "Duration must be at least 1 minute")
+        private Integer durationMinutes;
+
+        @Size(max = 100, message = "Language must not exceed 100 characters")
+        private String language;
 
         private Long venueId;
         private String venueName;
@@ -89,6 +98,15 @@ public class EventDto {
         private LocalDateTime endDate;
 
         private EventStatus status;
+
+        @Size(max = 150, message = "Director name must not exceed 150 characters")
+        private String director;
+
+        @Min(value = 1, message = "Duration must be at least 1 minute")
+        private Integer durationMinutes;
+
+        @Size(max = 100, message = "Language must not exceed 100 characters")
+        private String language;
 
         private Long venueId;
 
@@ -147,6 +165,9 @@ public class EventDto {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private EventStatus status;
+        private String director;
+        private Integer durationMinutes;
+        private String language;
         private String venueName;
         private String imageUrl;
     }
@@ -167,6 +188,9 @@ public class EventDto {
         private LocalDateTime startDate;
         private LocalDateTime endDate;
         private EventStatus status;
+        private String director;
+        private Integer durationMinutes;
+        private String language;
         private String imageUrl;
 
         private String venueName;
