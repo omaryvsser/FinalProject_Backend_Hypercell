@@ -62,4 +62,20 @@ public class EventEntity {
     @Builder.Default
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SeatCategoryEntity> seatCategories = new ArrayList<>();
+
+    public void addSeatCategory(SeatCategoryEntity category) {
+        if (this.seatCategories == null) {
+            this.seatCategories = new ArrayList<>();
+        }
+        this.seatCategories.add(category);
+        category.setEvent(this);
+    }
+
+    public void removeSeatCategory(SeatCategoryEntity category) {
+        if (this.seatCategories != null) {
+            this.seatCategories.remove(category);
+            category.setEvent(null);
+        }
+    }
+
 }

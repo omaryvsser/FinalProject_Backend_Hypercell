@@ -4,6 +4,7 @@ import com.hypercell.event_ticketing_platform.DTO.BookingDto;
 import com.hypercell.event_ticketing_platform.Entity.BookingEntity;
 import com.hypercell.event_ticketing_platform.Entity.EventEntity;
 import com.hypercell.event_ticketing_platform.Entity.SeatCategoryEntity;
+import com.hypercell.event_ticketing_platform.Entity.TicketEntity;
 import com.hypercell.event_ticketing_platform.Entity.UserEntity;
 import com.hypercell.event_ticketing_platform.Enum.BookingStatus;
 import com.hypercell.event_ticketing_platform.Repository.BookingRepository;
@@ -13,6 +14,7 @@ import com.hypercell.event_ticketing_platform.Repository.UserRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +28,9 @@ public class BookingService {
     private final UserRepository userRepository;
 
     public BookingService(BookingRepository bookingRepository,
-            SeatCategoryRepository seatCategoryRepository,
-            EventRepository eventRepository,
-            UserRepository userRepository) {
+                          SeatCategoryRepository seatCategoryRepository,
+                          EventRepository eventRepository,
+                          UserRepository userRepository) {
         this.bookingRepository = bookingRepository;
         this.seatCategoryRepository = seatCategoryRepository;
         this.eventRepository = eventRepository;
@@ -50,20 +52,44 @@ public class BookingService {
             throw new RuntimeException("Sorry, not enough seats available!");
         }
 
+        // Calculate starting seat index BEFORE deducting availability
+        int startingSeatIndex = seatCategory.getTotalSeats() - seatCategory.getAvailableSeats() + 1;
+
+        // 1. Deduct seat capacity
         seatCategory.setAvailableSeats(seatCategory.getAvailableSeats() - request.getQuantity());
         seatCategoryRepository.save(seatCategory);
 
+        // 2. Build Parent Booking Object
         BookingEntity booking = BookingEntity.builder()
                 .user(user)
                 .event(event)
                 .seatCategory(seatCategory)
                 .quantity(request.getQuantity())
-                .status(BookingStatus.PENDING)
+                .status(BookingStatus.CONFIRMED)
                 .bookingDate(LocalDateTime.now())
                 .build();
 
+        // 🟢 3. Generate tickets with unique seat numbers & booking codes
+        // 🟢 Generate tickets matching your TicketEntity schema
+        for (int i = 0; i < request.getQuantity(); i++) {
+            int seatNum = startingSeatIndex + i;
+
+            // Generates a unique string like "TKN-A9F3-1"
+            String uniqueTicketNumber = "TKN-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase() + "-" + seatNum;
+
+            TicketEntity ticket = TicketEntity.builder()
+                    .booking(booking)
+                    .ticketNumber(uniqueTicketNumber) // 👈 Matches property name in TicketEntity
+                    .isBooked(true)                   // 👈 Explicitly set booked flag
+                    .build();
+
+            booking.getTickets().add(ticket);
+        }
+
+        // 4. Save Booking + Tickets in atomic transaction
         BookingEntity savedBooking = bookingRepository.save(booking);
 
+        // 5. Map Response DTO
         BookingDto.Response dto = new BookingDto.Response();
         dto.setBookingId(savedBooking.getId());
         dto.setQuantity(savedBooking.getQuantity());

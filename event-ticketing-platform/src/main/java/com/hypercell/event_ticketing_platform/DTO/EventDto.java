@@ -3,6 +3,7 @@ package com.hypercell.event_ticketing_platform.DTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hypercell.event_ticketing_platform.Enum.EventStatus;
 import com.hypercell.event_ticketing_platform.Enum.SeatCategoryName;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -66,6 +67,8 @@ public class EventDto {
 
         private Long venueId;
         private String venueName;
+        @Valid
+        private List<SeatCategoryDto.CreateRequest> seatCategories;
 
 
         private String imageUrl;

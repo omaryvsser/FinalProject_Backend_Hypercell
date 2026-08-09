@@ -1,7 +1,9 @@
 package com.hypercell.event_ticketing_platform.Service;
 
 import com.hypercell.event_ticketing_platform.DTO.EventDto;
+import com.hypercell.event_ticketing_platform.DTO.SeatCategoryDto;
 import com.hypercell.event_ticketing_platform.Entity.EventEntity;
+import com.hypercell.event_ticketing_platform.Entity.SeatCategoryEntity;
 import com.hypercell.event_ticketing_platform.Entity.UserEntity;
 import com.hypercell.event_ticketing_platform.Entity.VenueEntity;
 import com.hypercell.event_ticketing_platform.Enum.EventStatus;
@@ -84,6 +86,21 @@ public class EventManagementServiceImpl implements EventManagementService {
                 .imageUrl(createEventDto.getImageUrl())
                 .build();
 
+        // 🟢 NEW: Map & Attach Seat Categories from createEventDto
+        if (createEventDto.getSeatCategories() != null && !createEventDto.getSeatCategories().isEmpty()) {
+            for (SeatCategoryDto.CreateRequest catDto : createEventDto.getSeatCategories()) {
+                SeatCategoryEntity seatCategory = SeatCategoryEntity.builder()
+                        .name(catDto.getName())
+                        .price(catDto.getPrice())
+                        .totalSeats(catDto.getTotalSeats())
+                        .availableSeats(catDto.getTotalSeats()) // Initially available = total
+                        .build();
+
+                // Attach to event bidirectionally
+                event.addSeatCategory(seatCategory);
+            }
+        }
+
         EventEntity savedEvent = eventRepository.save(event);
         return mapToEventResponseDto(savedEvent);
     }
@@ -153,6 +170,32 @@ public class EventManagementServiceImpl implements EventManagementService {
         return mapToEventResponseDto(updatedEvent);
     }
 
+    @Override
+    @Transactional
+    public void deleteEvent(Long eventId) {
+        UserEntity currentUser = getAuthenticatedUser();
+
+        EventEntity event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
+
+        // Ensures only the owner (or ADMIN) can delete it
+        verifyOwnership(event, currentUser);
+
+        // Clean up linked bookings and tickets for this event to avoid FK constraint violations
+        var bookings = bookingRepository.findByEventId(eventId);
+        if (bookings != null && !bookings.isEmpty()) {
+            for (var b : bookings) {
+                var tickets = ticketRepository.findByBookingUserId(b.getUser().getId());
+                if (tickets != null && !tickets.isEmpty()) {
+                    ticketRepository.deleteAll(tickets);
+                }
+            }
+            bookingRepository.deleteAll(bookings);
+        }
+
+        eventRepository.delete(event);
+    }
+
     private UserEntity getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -184,46 +227,5 @@ public class EventManagementServiceImpl implements EventManagementService {
                 .venueName(event.getVenue() != null ? event.getVenue().getName() : null)
                 .imageUrl(event.getImageUrl())
                 .build();
-    }
-    private EventDto.Response mapToResponseDto(EventEntity entity) {
-        return EventDto.Response.builder()
-                .id(entity.getId())
-                .title(entity.getTitle())
-                .description(entity.getDescription())
-                .category(entity.getCategory())
-                .startDate(entity.getStartDate())
-                .endDate(entity.getEndDate())
-                .status(entity.getStatus()) // 🟢 Direct EventStatus enum assignment
-                .director(entity.getDirector())
-                .durationMinutes(entity.getDurationMinutes())
-                .language(entity.getLanguage())
-                .venueName(entity.getVenue() != null ? entity.getVenue().getName() : null)
-                .imageUrl(entity.getImageUrl())
-                .build();
-    }
-    @Override
-    @Transactional
-    public void deleteEvent(Long eventId) {
-        UserEntity currentUser = getAuthenticatedUser();
-
-        EventEntity event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
-
-        // Ensures only the owner (or ADMIN) can delete it
-        verifyOwnership(event, currentUser);
-
-        // Clean up linked bookings and tickets for this event to avoid FK constraint violations
-        var bookings = bookingRepository.findByEventId(eventId);
-        if (bookings != null && !bookings.isEmpty()) {
-            for (var b : bookings) {
-                var tickets = ticketRepository.findByBookingUserId(b.getUser().getId());
-                if (tickets != null && !tickets.isEmpty()) {
-                    ticketRepository.deleteAll(tickets);
-                }
-            }
-            bookingRepository.deleteAll(bookings);
-        }
-
-        eventRepository.delete(event);
     }
 }
