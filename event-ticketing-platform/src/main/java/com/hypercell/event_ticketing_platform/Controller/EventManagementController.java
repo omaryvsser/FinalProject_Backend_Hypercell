@@ -57,4 +57,9 @@ public class EventManagementController {
         eventManagementService.deleteEvent(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<EventDto.DetailResponse> getEventById(@PathVariable Long id) {
+        EventDto.DetailResponse event = eventManagementService.getEventById(id);
+        return ResponseEntity.ok(event);
+    }
 }

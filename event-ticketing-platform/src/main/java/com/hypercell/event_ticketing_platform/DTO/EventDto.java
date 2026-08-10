@@ -114,6 +114,8 @@ public class EventDto {
 
 
         private String imageUrl;
+        @Valid
+        private List<SeatCategoryDto.CreateRequest> seatCategories;
     }
 
     /**

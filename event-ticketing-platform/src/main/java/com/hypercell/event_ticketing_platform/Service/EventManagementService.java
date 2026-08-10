@@ -12,5 +12,6 @@ public interface EventManagementService {
     EventDto.Response updateEvent(Long eventId, EventDto.UpdateRequest updateEventDto);
 
     EventDto.Response changeEventStatus(Long eventId, EventDto.ChangeStatusRequest statusDto);
+    EventDto.DetailResponse getEventById(Long id);
     void deleteEvent(Long eventId);
 }

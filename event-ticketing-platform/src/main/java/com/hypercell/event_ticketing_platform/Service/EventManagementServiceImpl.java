@@ -22,6 +22,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class EventManagementServiceImpl implements EventManagementService {
@@ -151,6 +154,34 @@ public class EventManagementServiceImpl implements EventManagementService {
             event.setImageUrl(updateEventDto.getImageUrl());
         }
 
+        // 🟢 FIX: Sync / Update Seat Categories & Prices
+        if (updateEventDto.getSeatCategories() != null && !updateEventDto.getSeatCategories().isEmpty()) {
+            for (SeatCategoryDto.CreateRequest catDto : updateEventDto.getSeatCategories()) {
+                // Find existing category by name to update price/seats, or create new if absent
+                event.getSeatCategories().stream()
+                        .filter(cat -> cat.getName() != null && cat.getName().equals(catDto.getName()))
+                        .findFirst()
+                        .ifPresentOrElse(
+                                existingCat -> {
+                                    existingCat.setPrice(catDto.getPrice());
+                                    // Adjust total seats and set available seats accordingly
+                                    int seatDiff = catDto.getTotalSeats() - existingCat.getTotalSeats();
+                                    existingCat.setTotalSeats(catDto.getTotalSeats());
+                                    existingCat.setAvailableSeats(Math.max(0, existingCat.getAvailableSeats() + seatDiff));
+                                },
+                                () -> {
+                                    SeatCategoryEntity newCat = SeatCategoryEntity.builder()
+                                            .name(catDto.getName())
+                                            .price(catDto.getPrice())
+                                            .totalSeats(catDto.getTotalSeats())
+                                            .availableSeats(catDto.getTotalSeats())
+                                            .build();
+                                    event.addSeatCategory(newCat);
+                                }
+                        );
+            }
+        }
+
         EventEntity updatedEvent = eventRepository.save(event);
         return mapToEventResponseDto(updatedEvent);
     }
@@ -226,6 +257,41 @@ public class EventManagementServiceImpl implements EventManagementService {
                 .language(event.getLanguage())
                 .venueName(event.getVenue() != null ? event.getVenue().getName() : null)
                 .imageUrl(event.getImageUrl())
+                .build();
+    }
+    @Override
+    public EventDto.DetailResponse getEventById(Long id) {
+        EventEntity event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + id));
+
+        return mapToEventDetailResponseDto(event);
+    }
+
+    private EventDto.DetailResponse mapToEventDetailResponseDto(EventEntity event) {
+        List<EventDto.DetailResponse.SeatCategoryResponse> categoryDtos = event.getSeatCategories().stream()
+                .map(cat -> EventDto.DetailResponse.SeatCategoryResponse.builder()
+                        .id(cat.getId()) // 🟢 Essential real database ID
+                        .categoryName(cat.getName())
+                        .price(cat.getPrice())
+                        .availableSeats(cat.getAvailableSeats())
+                        .build())
+                .collect(Collectors.toList());
+
+        return EventDto.DetailResponse.builder()
+                .id(event.getId())
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .category(event.getCategory())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .status(event.getStatus())
+                .director(event.getDirector())
+                .durationMinutes(event.getDurationMinutes())
+                .language(event.getLanguage())
+                .imageUrl(event.getImageUrl())
+                .venueName(event.getVenue() != null ? event.getVenue().getName() : null)
+                .venueAddress(event.getVenue() != null ? event.getVenue().getAddress() : null)
+                .seatCategories(categoryDtos) // 🟢 Attached seat categories with DB IDs
                 .build();
     }
 }
