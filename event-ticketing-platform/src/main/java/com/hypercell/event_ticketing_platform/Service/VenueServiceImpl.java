@@ -2,6 +2,9 @@ package com.hypercell.event_ticketing_platform.Service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,21 +28,17 @@ public class VenueServiceImpl implements VenueService {
     @Override
     @Transactional
     public VenueDto.Response addVenue(VenueDto.CreateRequest venueDto) {
-        // Check if a venue with the same name already exists
         if (venueRepository.existsByName(venueDto.getName())) {
             throw new ResourceAlreadyExistsException("Venue with name '" + venueDto.getName() + "' already exists");
         }
 
-        // Convert DTO to entity manually
         VenueEntity venue = VenueEntity.builder()
                 .name(venueDto.getName())
                 .address(venueDto.getAddress())
                 .capacity(venueDto.getCapacity())
                 .build();
 
-        // Save entity
         VenueEntity savedVenue = venueRepository.save(venue);
-
         return mapToVenueDto(savedVenue);
     }
 
@@ -47,8 +46,15 @@ public class VenueServiceImpl implements VenueService {
     @Transactional(readOnly = true)
     public List<VenueDto.Response> getAllVenues() {
         return venueRepository.findAll().stream()
-                .map(this::mapToVenueDto) 
+                .map(this::mapToVenueDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<VenueDto.Response> getPaginatedVenues(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return venueRepository.findAll(pageable).map(this::mapToVenueDto);
     }
 
     @Override
