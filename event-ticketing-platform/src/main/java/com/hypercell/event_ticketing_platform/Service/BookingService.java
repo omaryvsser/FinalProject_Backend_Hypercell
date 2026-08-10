@@ -74,13 +74,14 @@ public class BookingService {
         for (int i = 0; i < request.getQuantity(); i++) {
             int seatNum = startingSeatIndex + i;
 
-            // Generates a unique string like "TKN-A9F3-1"
             String uniqueTicketNumber = "TKN-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase() + "-" + seatNum;
+            String uniqueTicketCode = "TCK-QR-" + UUID.randomUUID().toString().toUpperCase();
 
             TicketEntity ticket = TicketEntity.builder()
                     .booking(booking)
-                    .ticketNumber(uniqueTicketNumber) // 👈 Matches property name in TicketEntity
-                    .isBooked(true)                   // 👈 Explicitly set booked flag
+                    .ticketNumber(uniqueTicketNumber)
+                    .ticketCode(uniqueTicketCode)
+                    .isBooked(true)
                     .build();
 
             booking.getTickets().add(ticket);

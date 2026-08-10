@@ -22,8 +22,12 @@ public class TicketService {
         int quantity = booking.getQuantity();
 
         for (int i = 0; i < quantity; i++) {
+            String ticketNum = "TICK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+            String ticketCode = "TCK-QR-" + UUID.randomUUID().toString().toUpperCase();
+
             TicketEntity ticket = TicketEntity.builder()
-                    .ticketNumber("TICK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
+                    .ticketNumber(ticketNum)
+                    .ticketCode(ticketCode)
                     .isBooked(true)
                     .booking(booking)
                     .build();
@@ -34,7 +38,7 @@ public class TicketService {
         ticketRepository.saveAll(tickets);
     }
 
-    // 2. جلب تذاكر المستخدم وعرضها مع اسم الفعالية ومقعدها للفرونت
+    // 2. Fetch user tickets with QR ticket codes
     public List<TicketDto> getUserTickets(Long userId) {
         List<TicketEntity> tickets = ticketRepository.findByBookingUserId(userId);
 
@@ -45,9 +49,14 @@ public class TicketService {
             String seatCategoryName = (booking.getSeatCategory() != null) ? booking.getSeatCategory().getName().name()
                     : "Unknown";
 
+            String code = ticket.getTicketCode() != null && !ticket.getTicketCode().isEmpty()
+                    ? ticket.getTicketCode()
+                    : (ticket.getTicketNumber() != null ? ticket.getTicketNumber() : "TCK-QR-" + ticket.getId());
+
             return new TicketDto(
                     ticket.getId(),
                     ticket.getTicketNumber(),
+                    code,
                     eventName,
                     seatCategoryName,
                     ticket.getIsBooked(),

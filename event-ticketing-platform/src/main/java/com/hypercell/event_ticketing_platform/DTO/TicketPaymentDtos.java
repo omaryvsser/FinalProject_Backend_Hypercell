@@ -28,6 +28,7 @@ public class TicketPaymentDtos {
     public record TicketDto(
             Long id,
             String ticketNumber,
+            String ticketCode,
             String eventName,
             String seatCategoryName,
             Boolean isBooked,

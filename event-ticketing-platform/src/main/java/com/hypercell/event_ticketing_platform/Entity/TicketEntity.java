@@ -19,6 +19,9 @@ public class TicketEntity {
     @Column(name = "ticket_number", nullable = false, unique = true, length = 255)
     private String ticketNumber;
 
+    @Column(name = "ticket_code", unique = true, length = 255)
+    private String ticketCode;
+
     @Builder.Default
     @Column(name = "is_booked", nullable = false)
     private Boolean isBooked = false;
