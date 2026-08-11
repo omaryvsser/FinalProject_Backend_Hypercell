@@ -42,7 +42,7 @@ public class BookingEntity {
     @JoinColumn(name = "seat_category_id", nullable = false)
     private SeatCategoryEntity seatCategory;
 
-    // 🟢 Changed from List to Set to prevent Hibernate duplicate joins/records
+    //  Changed from List to Set to prevent Hibernate duplicate joins/records
     @Builder.Default
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<TicketEntity> tickets = new HashSet<>();

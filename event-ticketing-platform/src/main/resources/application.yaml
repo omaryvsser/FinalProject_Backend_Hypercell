@@ -1,36 +1,20 @@
 spring:
-  application:
-    name: ticketing_system_db
-
+  # [ADDED FOR TESTING] - H2 Database & Console Configuration
+  # =========================================================
   datasource:
-    url: jdbc:postgresql://localhost:5432/ticketing_system_db
-    username: postgres
-    password: "1234"
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
-    show-sql: true
-
-  liquibase:
-    enabled: true
-    change-log: classpath:/db/changelog/db.changelog-master.yaml
-
-  # 🟢 Moved under 'spring:'
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
-    enabled: true
-  packages-to-scan: com.hypercell.event_ticketing_platform
-
-# 🟢 Moved to root level
-file:
-  upload-dir: uploads
+    defer-datasource-initialization: true # يضمن إنشاء الجداول قبل تشغيل ملف data.sql
+  # =========================================================

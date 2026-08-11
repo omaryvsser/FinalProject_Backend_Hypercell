@@ -1,6 +1,8 @@
 package com.hypercell.event_ticketing_platform.Service;
 
 import com.hypercell.event_ticketing_platform.DTO.BookingDto;
+// 🟢 [ADDED IMPORT] - استيراد الـ DTO الجديد لتفادي خطأ cannot be resolved
+import com.hypercell.event_ticketing_platform.DTO.EventOrganizerSummaryDto;
 import com.hypercell.event_ticketing_platform.Entity.BookingEntity;
 import com.hypercell.event_ticketing_platform.Entity.EventEntity;
 import com.hypercell.event_ticketing_platform.Entity.SeatCategoryEntity;
@@ -52,14 +54,11 @@ public class BookingService {
             throw new RuntimeException("Sorry, not enough seats available!");
         }
 
-        // Calculate starting seat index BEFORE deducting availability
         int startingSeatIndex = seatCategory.getTotalSeats() - seatCategory.getAvailableSeats() + 1;
 
-        // 1. Deduct seat capacity
         seatCategory.setAvailableSeats(seatCategory.getAvailableSeats() - request.getQuantity());
         seatCategoryRepository.save(seatCategory);
 
-        // 2. Build Parent Booking Object
         BookingEntity booking = BookingEntity.builder()
                 .user(user)
                 .event(event)
@@ -69,8 +68,6 @@ public class BookingService {
                 .bookingDate(LocalDateTime.now())
                 .build();
 
-        // 🟢 3. Generate tickets with unique seat numbers & booking codes
-        // 🟢 Generate tickets matching your TicketEntity schema
         for (int i = 0; i < request.getQuantity(); i++) {
             int seatNum = startingSeatIndex + i;
 
@@ -87,10 +84,8 @@ public class BookingService {
             booking.getTickets().add(ticket);
         }
 
-        // 4. Save Booking + Tickets in atomic transaction
         BookingEntity savedBooking = bookingRepository.save(booking);
 
-        // 5. Map Response DTO
         BookingDto.Response dto = new BookingDto.Response();
         dto.setBookingId(savedBooking.getId());
         dto.setQuantity(savedBooking.getQuantity());
@@ -181,4 +176,48 @@ public class BookingService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    // =========================================================
+    // 🟢 [ADDED FOR ORGANIZER FEATURE] - Get Detailed Event Summary
+    // =========================================================
+    public EventOrganizerSummaryDto getEventOrganizerSummary(Long eventId) {
+        EventEntity event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
+
+        List<BookingEntity> bookings = bookingRepository.findByEventId(eventId);
+
+        List<EventOrganizerSummaryDto.BookingUserDetailDto> userDetails = bookings.stream()
+                .filter(b -> b != null && BookingStatus.CONFIRMED.equals(b.getStatus()))
+                .map(b -> {
+                    EventOrganizerSummaryDto.BookingUserDetailDto userDto = new EventOrganizerSummaryDto.BookingUserDetailDto();
+                    userDto.setBookingId(b.getId());
+                    userDto.setQuantity(b.getQuantity() != null ? b.getQuantity() : 0);
+                    userDto.setBookingDate(b.getBookingDate());
+
+                    if (b.getUser() != null) {
+                        userDto.setUserId(b.getUser().getId());
+                        userDto.setUserEmail(b.getUser().getEmail());
+                        // 🟢 استخدام getEmail() كاسم بديل إذا لم توجد getName() لتفادي الخطأ
+                        userDto.setUserName(b.getUser().getEmail()); 
+                    } else {
+                        userDto.setUserName("Unknown User");
+                        userDto.setUserEmail("N/A");
+                    }
+
+                    return userDto;
+                }).collect(Collectors.toList());
+
+        int totalTicketsSold = userDetails.stream()
+                .mapToInt(dto -> dto.getQuantity() != null ? dto.getQuantity() : 0)
+                .sum();
+
+        EventOrganizerSummaryDto response = new EventOrganizerSummaryDto();
+        response.setEventId(event.getId());
+        response.setEventTitle(event.getTitle());
+        response.setTotalTicketsSold(totalTicketsSold);
+        response.setBookings(userDetails);
+
+        return response;
+    }
+    // =========================================================
 }
