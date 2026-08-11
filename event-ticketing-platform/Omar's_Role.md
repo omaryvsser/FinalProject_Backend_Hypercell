@@ -130,12 +130,25 @@ sequenceDiagram
    ```
    *Rationale:* If an active administrator attempts to change their own role (e.g., demoting themselves from `ADMIN` to `CUSTOMER`), the service detects that `currentAdminUsername` matches the target user's username/email and aborts the transaction, preventing accidental lockouts.
 
-2. **Missing User Exception Handling:**
+2. **Admin Self-Deletion Safeguard & Cascade Cleanup:**
+   ```java
+   if (currentAdminUsername != null &&
+      (currentAdminUsername.equalsIgnoreCase(targetUser.getUsername()) || 
+       currentAdminUsername.equalsIgnoreCase(targetUser.getEmail()))) {
+       throw new IllegalArgumentException("Action Denied: Admin cannot delete their own account.");
+   }
+   ```
+   *Rationale:* Admins cannot accidentally delete their own logged-in system account. Before removing a user from the repository, the service performs cascade cleanup of any associated `TicketEntity` and `BookingEntity` records to prevent foreign key constraint violations in PostgreSQL.
+
+3. **Missing User Exception Handling:**
    ```java
    UserEntity targetUser = userRepository.findById(targetUserId)
            .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + targetUserId));
    ```
-   *Rationale:* If an admin supplies a non-existent user ID, the service throws `ResourceNotFoundException`, which is caught by `@ControllerAdvice` to return a clean `404 Not Found` JSON response.
+   *Rationale:* If an admin supplies a non-existent user ID, the service throws `ResourceNotFoundException`, which is caught by `@RestControllerAdvice` to return a clean `404 Not Found` JSON response.
+
+4. **Flexible & Paginated User Roster Retrieval:**
+   Supports both full user list retrieval (`GET /api/admin/users`) and paginated queries (`GET /api/admin/users?page=0&size=10`), allowing administration dashboards to render efficiently across small and large user bases.
 
 ---
 
