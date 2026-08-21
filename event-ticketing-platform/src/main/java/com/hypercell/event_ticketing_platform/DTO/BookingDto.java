@@ -51,11 +51,27 @@ public class BookingDto {
     public static class Response {
 
         private Long bookingId;
+        private String customerName;
+        private String customerEmail;
+        private String organizerName;
         private String eventTitle;
         private String seatCategoryName;
         private int quantity;
         private BigDecimal totalPrice;
         private BookingStatus status;
         private LocalDateTime createdAt;
+    }
+
+    /**
+     * Request payload for modifying a booking status.
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StatusUpdateRequest {
+
+        @NotNull(message = "Status is required")
+        private BookingStatus status;
     }
 }
