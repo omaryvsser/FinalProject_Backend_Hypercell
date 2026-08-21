@@ -1,6 +1,7 @@
 package com.hypercell.event_ticketing_platform.DTO;
 
 import com.hypercell.event_ticketing_platform.Enum.BookingStatus;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,7 @@ public class BookingDto {
         private Long seatCategoryId;
 
         @Min(value = 1, message = "Quantity must be at least 1")
+        @Max(value = 8, message = "Maximum 8 tickets allowed per booking")
         private int quantity;
     }
 

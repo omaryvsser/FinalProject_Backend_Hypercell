@@ -39,6 +39,14 @@ public class BookingService {
 
     @Transactional
     public BookingDto.Response createBooking(BookingDto.CreateRequest request) {
+        if (request.getQuantity() < 1) {
+            throw new IllegalArgumentException("Quantity must be at least 1.");
+        }
+
+        if (request.getQuantity() > 8) {
+            throw new IllegalArgumentException("Maximum 8 tickets allowed per booking.");
+        }
+
         UserEntity user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
