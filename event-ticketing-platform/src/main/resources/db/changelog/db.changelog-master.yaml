@@ -21,3 +21,5 @@ databaseChangeLog:
       file: db/changelog/changelog-09-seed-data.yaml
   - include:
       file: db/changelog/changelog-09-sync-seat-categories-sequence.yaml
+  - include:
+      file: db/changelog/changelog-10-create-seats-table.yaml

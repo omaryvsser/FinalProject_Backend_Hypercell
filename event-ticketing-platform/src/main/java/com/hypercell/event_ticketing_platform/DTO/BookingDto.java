@@ -39,6 +39,9 @@ public class BookingDto {
         @Min(value = 1, message = "Quantity must be at least 1")
         @Max(value = 8, message = "Maximum 8 tickets allowed per booking")
         private int quantity;
+
+        /** Optional list of specific physical seat IDs selected on the seat map */
+        private java.util.List<Long> seatIds;
     }
 
     /**
@@ -60,6 +63,7 @@ public class BookingDto {
         private BigDecimal totalPrice;
         private BookingStatus status;
         private LocalDateTime createdAt;
+        private java.util.List<String> seatCodes;
     }
 
     /**

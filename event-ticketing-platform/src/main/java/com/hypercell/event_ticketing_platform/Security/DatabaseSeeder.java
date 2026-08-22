@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class DatabaseSeeder {
     private final EventRepository eventRepository;
     private final SeatCategoryRepository seatCategoryRepository;
     private final BookingRepository bookingRepository;
+    private final SeatRepository seatRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -107,6 +109,10 @@ public class DatabaseSeeder {
                     .capacity(2000)
                     .build());
 
+            // 2.5 Seed Venue Seats
+            List<SeatEntity> venue1Seats = seedVenueSeats(venue1);
+            seedVenueSeats(venue2);
+
             // 3. Seed Events (with Image URLs)
             EventEntity event1 = eventRepository.save(EventEntity.builder()
                     .title("Tech Summit 2026")
@@ -159,9 +165,45 @@ public class DatabaseSeeder {
                     .seatCategory(seatCat1)
                     .build();
 
+            if (venue1Seats.size() >= 2) {
+                booking.addTicket(TicketEntity.builder()
+                        .ticketNumber("TKN-SEED01-A1")
+                        .ticketCode("TCK-QR-SEED01-A1")
+                        .isBooked(true)
+                        .seat(venue1Seats.get(0))
+                        .build());
+                booking.addTicket(TicketEntity.builder()
+                        .ticketNumber("TKN-SEED02-A2")
+                        .ticketCode("TCK-QR-SEED02-A2")
+                        .isBooked(true)
+                        .seat(venue1Seats.get(1))
+                        .build());
+            }
+
             bookingRepository.save(booking);
 
             System.out.println("✅ Database seeding completed successfully!");
         };
+    }
+
+    private List<SeatEntity> seedVenueSeats(VenueEntity venue) {
+        if (seatRepository.existsByVenueId(venue.getId())) {
+            return seatRepository.findByVenueIdOrderByRowNameAscSeatNumberAsc(venue.getId());
+        }
+        List<SeatEntity> list = new java.util.ArrayList<>();
+        String[] rows = {"A", "B", "C", "D", "E", "F"};
+        for (String r : rows) {
+            SeatCategoryName cat = "F".equals(r) ? SeatCategoryName.VIP : ("E".equals(r) ? SeatCategoryName.IMAX : SeatCategoryName.STANDARD);
+            for (int n = 1; n <= 8; n++) {
+                list.add(SeatEntity.builder()
+                        .venue(venue)
+                        .rowName(r)
+                        .seatNumber(n)
+                        .seatCode(r + n)
+                        .categoryName(cat)
+                        .build());
+            }
+        }
+        return seatRepository.saveAll(list);
     }
 }

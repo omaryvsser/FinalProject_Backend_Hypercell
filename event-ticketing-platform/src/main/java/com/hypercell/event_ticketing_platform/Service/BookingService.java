@@ -1,17 +1,10 @@
 package com.hypercell.event_ticketing_platform.Service;
 
 import com.hypercell.event_ticketing_platform.DTO.BookingDto;
-import com.hypercell.event_ticketing_platform.Entity.BookingEntity;
-import com.hypercell.event_ticketing_platform.Entity.EventEntity;
-import com.hypercell.event_ticketing_platform.Entity.SeatCategoryEntity;
-import com.hypercell.event_ticketing_platform.Entity.TicketEntity;
-import com.hypercell.event_ticketing_platform.Entity.UserEntity;
+import com.hypercell.event_ticketing_platform.Entity.*;
 import com.hypercell.event_ticketing_platform.Enum.BookingStatus;
 import com.hypercell.event_ticketing_platform.Enum.UserRole;
-import com.hypercell.event_ticketing_platform.Repository.BookingRepository;
-import com.hypercell.event_ticketing_platform.Repository.EventRepository;
-import com.hypercell.event_ticketing_platform.Repository.SeatCategoryRepository;
-import com.hypercell.event_ticketing_platform.Repository.UserRepository;
+import com.hypercell.event_ticketing_platform.Repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,17 +29,26 @@ public class BookingService {
     private final SeatCategoryRepository seatCategoryRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final SeatRepository seatRepository;
+    private final TicketRepository ticketRepository;
 
     public BookingService(BookingRepository bookingRepository,
                           SeatCategoryRepository seatCategoryRepository,
                           EventRepository eventRepository,
-                          UserRepository userRepository) {
+                          UserRepository userRepository,
+                          SeatRepository seatRepository,
+                          TicketRepository ticketRepository) {
         this.bookingRepository = bookingRepository;
         this.seatCategoryRepository = seatCategoryRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.seatRepository = seatRepository;
+        this.ticketRepository = ticketRepository;
     }
 
+    /**
+     * Creates a new booking reservation with strict Pessimistic Locking concurrency protection.
+     */
     @Transactional
     public BookingDto.Response createBooking(BookingDto.CreateRequest request) {
         if (request.getQuantity() < 1) {
@@ -62,15 +65,38 @@ public class BookingService {
         EventEntity event = eventRepository.findById(request.getEventId())
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        SeatCategoryEntity seatCategory = seatCategoryRepository.findById(request.getSeatCategoryId())
+        // 🔒 PESSIMISTIC LOCK: Acquired on SeatCategoryEntity to prevent concurrent overbooking
+        SeatCategoryEntity seatCategory = seatCategoryRepository.findByIdWithLock(request.getSeatCategoryId())
                 .orElseThrow(() -> new RuntimeException("Seat category not found"));
 
         if (seatCategory.getAvailableSeats() < request.getQuantity()) {
             throw new RuntimeException("Sorry, not enough seats available!");
         }
 
-        // Calculate starting seat index BEFORE deducting availability
-        int startingSeatIndex = seatCategory.getTotalSeats() - seatCategory.getAvailableSeats() + 1;
+        List<SeatEntity> selectedSeats = new ArrayList<>();
+        if (request.getSeatIds() != null && !request.getSeatIds().isEmpty()) {
+            if (request.getSeatIds().size() != request.getQuantity()) {
+                throw new IllegalArgumentException("Selected seat count (" + request.getSeatIds().size() +
+                        ") does not match requested quantity (" + request.getQuantity() + ").");
+            }
+
+            selectedSeats = seatRepository.findByIdIn(request.getSeatIds());
+            if (selectedSeats.size() != request.getSeatIds().size()) {
+                throw new RuntimeException("One or more selected seats could not be found.");
+            }
+
+            // Validate that all seats belong to the event venue
+            for (SeatEntity seat : selectedSeats) {
+                if (event.getVenue() == null || !seat.getVenue().getId().equals(event.getVenue().getId())) {
+                    throw new IllegalArgumentException("Seat " + seat.getSeatCode() + " does not belong to the event's venue.");
+                }
+            }
+
+            // Validate under lock that none of the requested seats are already booked for this event
+            if (ticketRepository.areAnySeatsBookedForEvent(event.getId(), request.getSeatIds())) {
+                throw new IllegalStateException("One or more selected seats are no longer available. Please choose different seats.");
+            }
+        }
 
         // 1. Deduct seat capacity
         seatCategory.setAvailableSeats(seatCategory.getAvailableSeats() - request.getQuantity());
@@ -86,21 +112,39 @@ public class BookingService {
                 .bookingDate(LocalDateTime.now())
                 .build();
 
-        // 3. Generate tickets with unique seat numbers & booking codes
-        for (int i = 0; i < request.getQuantity(); i++) {
-            int seatNum = startingSeatIndex + i;
+        // 3. Generate tickets linked to physical seats or sequential indices
+        if (!selectedSeats.isEmpty()) {
+            for (SeatEntity seat : selectedSeats) {
+                String uniqueTicketNumber = "TKN-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase() + "-" + seat.getSeatCode();
+                String uniqueTicketCode = "TCK-QR-" + UUID.randomUUID().toString().toUpperCase();
 
-            String uniqueTicketNumber = "TKN-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase() + "-" + seatNum;
-            String uniqueTicketCode = "TCK-QR-" + UUID.randomUUID().toString().toUpperCase();
+                TicketEntity ticket = TicketEntity.builder()
+                        .booking(booking)
+                        .seat(seat)
+                        .ticketNumber(uniqueTicketNumber)
+                        .ticketCode(uniqueTicketCode)
+                        .isBooked(true)
+                        .build();
 
-            TicketEntity ticket = TicketEntity.builder()
-                    .booking(booking)
-                    .ticketNumber(uniqueTicketNumber)
-                    .ticketCode(uniqueTicketCode)
-                    .isBooked(true)
-                    .build();
+                booking.getTickets().add(ticket);
+            }
+        } else {
+            int startingSeatIndex = seatCategory.getTotalSeats() - seatCategory.getAvailableSeats() + 1;
+            for (int i = 0; i < request.getQuantity(); i++) {
+                int seatNum = startingSeatIndex + i;
 
-            booking.getTickets().add(ticket);
+                String uniqueTicketNumber = "TKN-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase() + "-" + seatNum;
+                String uniqueTicketCode = "TCK-QR-" + UUID.randomUUID().toString().toUpperCase();
+
+                TicketEntity ticket = TicketEntity.builder()
+                        .booking(booking)
+                        .ticketNumber(uniqueTicketNumber)
+                        .ticketCode(uniqueTicketCode)
+                        .isBooked(true)
+                        .build();
+
+                booking.getTickets().add(ticket);
+            }
         }
 
         // 4. Save Booking + Tickets in atomic transaction
@@ -110,6 +154,10 @@ public class BookingService {
         return mapToResponse(savedBooking);
     }
 
+    /**
+     * Cancels an active booking WITHOUT acquiring a pessimistic lock.
+     * Restores category capacity and marks tickets/seats as available.
+     */
     @Transactional
     public void cancelBooking(Long bookingId) {
         BookingEntity booking = bookingRepository.findById(bookingId)
@@ -132,7 +180,7 @@ public class BookingService {
 
         bookingRepository.save(booking);
 
-        // Restore reserved seat capacity exactly once
+        // Restore reserved seat capacity without pessimistic locking
         SeatCategoryEntity seatCategory = booking.getSeatCategory();
         if (seatCategory != null) {
             seatCategory.setAvailableSeats(seatCategory.getAvailableSeats() + booking.getQuantity());
@@ -176,9 +224,6 @@ public class BookingService {
 
     /**
      * Validates that the current authenticated user has permission to manage the given booking.
-     * - ADMIN: Can manage any booking.
-     * - ORGANIZER: Can only manage bookings for events they own.
-     * - CUSTOMER: Can only cancel their own booking.
      */
     private void validateBookingManagementAccess(BookingEntity booking) {
         UserEntity currentUser = getAuthenticatedUser();
@@ -272,6 +317,18 @@ public class BookingService {
                 dto.setTotalPrice(totalPrice);
             }
         }
+
+        if (booking.getTickets() != null) {
+            List<String> seatCodes = booking.getTickets().stream()
+                    .filter(t -> t.getSeat() != null && t.getSeat().getSeatCode() != null)
+                    .map(t -> t.getSeat().getSeatCode())
+                    .sorted()
+                    .collect(Collectors.toList());
+            if (!seatCodes.isEmpty()) {
+                dto.setSeatCodes(seatCodes);
+            }
+        }
+
         return dto;
     }
 }

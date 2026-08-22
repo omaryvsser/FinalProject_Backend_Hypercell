@@ -29,7 +29,9 @@ public class SecurityConfig {
     /** Public endpoints list accessible without bearer authentication */
     private static final String[] WHITE_LIST_URLS = {
             "/api/v1/auth/**",
-            "/api/public/events/**",
+            "/api/public/**",
+            "/api/events/*/seats",
+            "/api/events/*/seats/**",
             "/v3/api-docs/**",
             "/v3/api-docs.yaml",
             "/swagger-ui/**",

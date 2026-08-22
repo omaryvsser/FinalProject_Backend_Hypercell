@@ -20,7 +20,11 @@ public interface SeatCategoryRepository extends JpaRepository<SeatCategoryEntity
 
     boolean existsByEventIdAndName(Long eventId, SeatCategoryName name);
 
+    /**
+     * Dedicated Pessimistic Lock for Booking transactions.
+     * Prevents concurrency race conditions during ticket booking.
+     */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT s FROM SeatCategoryEntity s WHERE s.id = :id")
-    Optional<SeatCategoryEntity> findById(@Param("id") Long id);
+    Optional<SeatCategoryEntity> findByIdWithLock(@Param("id") Long id);
 }

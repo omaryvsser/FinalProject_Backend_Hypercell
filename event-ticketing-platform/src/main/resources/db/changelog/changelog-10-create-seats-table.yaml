@@ -1,0 +1,69 @@
+databaseChangeLog:
+  - changeSet:
+      id: 10-create-seats-table
+      author: backend-developer
+      changes:
+        - createTable:
+            tableName: seats
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: venue_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: row_name
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: seat_number
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: seat_code
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_name
+                  type: varchar(50)
+                  defaultValue: "STANDARD"
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: seats
+            baseColumnNames: venue_id
+            referencedTableName: venues
+            referencedColumnNames: id
+            constraintName: fk_seats_venue
+
+        - addUniqueConstraint:
+            tableName: seats
+            columnNames: venue_id, row_name, seat_number
+            constraintName: uk_seats_venue_row_number
+
+        - addColumn:
+            tableName: tickets
+            columns:
+              - column:
+                  name: seat_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+
+        - addForeignKeyConstraint:
+            baseTableName: tickets
+            baseColumnNames: seat_id
+            referencedTableName: seats
+            referencedColumnNames: id
+            constraintName: fk_tickets_seat
